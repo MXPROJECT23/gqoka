@@ -1,3 +1,9 @@
+<a
+  href="/chat?prompt=Peux-tu me proposer 3 looks avec mes pièces actuelles ?"
+  className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-gray-50"
+>
+  ✨ Générer 3 idées de looks
+</a>
 import AnnaFloatingButton from "../components/AnnaFloatingButton";
 // ...dans le JSX :
 <AnnaFloatingButton />
