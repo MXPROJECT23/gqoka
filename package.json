@@ -16,8 +16,7 @@
     "tailwindcss": "latest",
     "postcss": "latest",
     "autoprefixer": "latest",
-    "@types/react": "latest",
-    "@types/node": "latest"
+    "@types/react": "^18.2.0",
+    "@types/node": "^18.0.0"
   }
 }
-
