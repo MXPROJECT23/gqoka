@@ -1,55 +1,46 @@
-// components/Hero.tsx
 import { motion } from "framer-motion";
-import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[#0B0D12] text-white">
-      <div className="mx-auto max-w-6xl px-6 py-24">
-        <motion.h1
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-5xl md:text-6xl font-extrabold tracking-tight"
-        >
-          Votre **styliste IA**,
-          <span className="block text-[#5B8CFF]">dans votre poche.</span>
-        </motion.h1>
+    <section className="relative flex flex-col items-center justify-center text-center px-6 py-24 bg-gradient-to-b from-blue-100 to-white">
+      {/* Halo animé */}
+      <motion.div
+        className="absolute w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30"
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 6, repeat: Infinity }}
+      />
 
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-          className="mt-6 max-w-2xl text-lg text-[#E6E8EB]/80"
-        >
-          GQOKA analyse votre garde-robe et propose des looks réellement portables.
-          Zéro scroll infini. 100% vous.
-        </motion.p>
+      {/* Texte principal */}
+      <motion.h1
+        className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 relative"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+        Votre styliste IA ✨
+      </motion.h1>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-10 flex flex-wrap gap-4"
-        >
-          <Link
-            href="/signup"
-            className="px-6 py-3 rounded-xl bg-white text-black font-medium hover:opacity-90 transition"
-          >
-            Essayer gratuitement
-          </Link>
-          <Link
-            href="/wardrobe"
-            className="px-6 py-3 rounded-xl border border-white/20 font-medium hover:bg-white/10 transition"
-          >
-            Voir une démo
-          </Link>
-        </motion.div>
-      </div>
+      <motion.p
+        className="text-lg md:text-2xl text-gray-600 mb-8 max-w-2xl relative"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 1 }}
+      >
+        Anna analyse votre garde-robe et la météo pour vous proposer des looks
+        uniques, personnalisés et toujours tendance.
+      </motion.p>
 
-      {/* Halo d’arrière-plan */}
-      <div className="pointer-events-none absolute -top-24 right-[-10%] h-96 w-96 rounded-full blur-3xl"
-           style={{ background: "radial-gradient(600px circle at 50% 50%, #5B8CFF33, transparent 60%)" }} />
+      {/* CTA */}
+      <motion.a
+        href="/signup"
+        className="px-8 py-4 bg-blue-600 text-white text-lg rounded-full shadow-lg hover:bg-blue-700 transition relative"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1, duration: 0.5 }}
+      >
+        Essayer gratuitement
+      </motion.a>
     </section>
   );
 }
+
