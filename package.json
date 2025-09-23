@@ -1,3 +1,8 @@
+"devDependencies": {
+  "typescript": "latest",
+  "@types/react": "latest",
+  "@types/node": "latest"
+}
 {
   "name": "gqoka",
   "version": "1.0.0",
