@@ -1,6 +1,7 @@
 {
   "name": "gqoka",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,11 +13,9 @@
     "react-dom": "latest"
   },
   "devDependencies": {
-    "tailwindcss": "latest",
-    "postcss": "latest",
-    "autoprefixer": "latest",
-    "typescript": "latest",
-    "@types/react": "latest",
-    "@types/node": "latest"
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.6",
+    "tailwindcss": "^3.0.23",
+    "@netlify/plugin-nextjs": "4.41.2"
   }
 }
