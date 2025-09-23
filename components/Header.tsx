@@ -9,7 +9,7 @@ export default function Header() {
           GQOKA
         </Link>
 
-        {/* Navigation */}
+        {/* Navigation desktop */}
         <nav className="hidden md:flex space-x-8 text-gray-700 font-medium">
           <Link href="/">Accueil</Link>
           <Link href="/wardrobe">Ma garde-robe</Link>
