@@ -6,6 +6,7 @@ interface Item {
   name: string;
   category: string;
   image: string;
+  user_id: string;
 }
 
 export default function Wardrobe() {
@@ -13,24 +14,41 @@ export default function Wardrobe() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Charger les vêtements depuis Supabase
+  // Vérifier l'utilisateur connecté
   useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) setUserId(user.id);
+    };
+    getUser();
+  }, []);
+
+  // Charger les vêtements de l'utilisateur
+  useEffect(() => {
+    if (!userId) return;
     const fetchItems = async () => {
-      const { data, error } = await supabase.from("wardrobe").select("*");
+      const { data, error } = await supabase
+        .from("wardrobe")
+        .select("*")
+        .eq("user_id", userId);
+
       if (error) console.error("Erreur Supabase :", error);
       else setItems(data || []);
     };
     fetchItems();
-  }, []);
+  }, [userId]);
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !category || !image) return;
+    if (!name || !category || !image || !userId) return;
 
     const { data, error } = await supabase
       .from("wardrobe")
-      .insert([{ name, category, image }])
+      .insert([{ name, category, image, user_id: userId }])
       .select();
 
     if (error) {
@@ -47,76 +65,85 @@ export default function Wardrobe() {
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <h1 className="text-3xl font-bold text-center mb-10">Ma Garde-Robe</h1>
 
-      {/* Formulaire ajout vêtement */}
-      <form
-        onSubmit={handleAddItem}
-        className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow space-y-4"
-      >
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nom du vêtement
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500"
-            placeholder="Ex: Chemise blanche"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Catégorie
-          </label>
-          <input
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500"
-            placeholder="Ex: Haut, Pantalon, Chaussures..."
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            URL de l’image
-          </label>
-          <input
-            type="url"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            required
-            className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500"
-            placeholder="Collez l’URL de l’image"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-900 transition"
-        >
-          Ajouter à la garde-robe
-        </button>
-      </form>
-
-      {/* Liste des vêtements */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-xl shadow p-4 flex flex-col items-center"
+      {!userId ? (
+        <p className="text-center text-gray-600">
+          Veuillez vous connecter pour accéder à votre garde-robe.
+        </p>
+      ) : (
+        <>
+          {/* Formulaire ajout vêtement */}
+          <form
+            onSubmit={handleAddItem}
+            className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow space-y-4"
           >
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-32 h-32 object-cover rounded-lg mb-4"
-            />
-            <h2 className="text-lg font-semibold">{item.name}</h2>
-            <p className="text-gray-500">{item.category}</p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nom du vêtement
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500"
+                placeholder="Ex: Chemise blanche"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Catégorie
+              </label>
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+                className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500"
+                placeholder="Ex: Haut, Pantalon, Chaussures..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                URL de l’image
+              </label>
+              <input
+                type="url"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                required
+                className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500"
+                placeholder="Collez l’URL de l’image"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-900 transition"
+            >
+              Ajouter à la garde-robe
+            </button>
+          </form>
+
+          {/* Liste des vêtements */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-xl shadow p-4 flex flex-col items-center"
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-32 h-32 object-cover rounded-lg mb-4"
+                />
+                <h2 className="text-lg font-semibold">{item.name}</h2>
+                <p className="text-gray-500">{item.category}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }
+
 
