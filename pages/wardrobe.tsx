@@ -1,3 +1,14 @@
+import WeatherWidget from "../components/WeatherWidget";
+
+export default function Wardrobe() {
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6">Ma Garde-Robe</h1>
+      <WeatherWidget city="Paris" />
+      {/* ...reste de la page */}
+    </div>
+  );
+}
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import WeatherWidget from "../components/WeatherWidget";
