@@ -13,9 +13,3 @@ export default function Home() {
     </div>
   );
 }
-
-        © {new Date().getFullYear()} GQOKA – Tous droits réservés.
-      </footer>
-    </div>
-  );
-}
