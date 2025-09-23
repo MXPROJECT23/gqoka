@@ -1,3 +1,6 @@
+import AnnaFloatingButton from "../components/AnnaFloatingButton";
+// ...dans le JSX :
+<AnnaFloatingButton />
 // components/AnnaFloatingButton.tsx
 import Link from "next/link";
 
