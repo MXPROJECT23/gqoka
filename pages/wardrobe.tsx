@@ -1,3 +1,16 @@
+// components/AnnaFloatingButton.tsx
+import Link from "next/link";
+
+export default function AnnaFloatingButton() {
+  return (
+    <Link
+      href="/chat"
+      className="fixed bottom-6 right-6 z-50 rounded-full px-4 py-3 bg-[#5B8CFF] text-white shadow-xl hover:scale-105 transition"
+    >
+      Parler à Anna ✨
+    </Link>
+  );
+}
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 
