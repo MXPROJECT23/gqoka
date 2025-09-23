@@ -1,3 +1,4 @@
+import Header from "../components/Header";
 import AnnaFloatingButton from "../components/AnnaFloatingButton";
 // ...dans le JSX :
 <AnnaFloatingButton />
