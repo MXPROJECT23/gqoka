@@ -1,3 +1,6 @@
+import AnnaFloatingButton from "../components/AnnaFloatingButton";
+// ...dans le JSX :
+<AnnaFloatingButton />
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
