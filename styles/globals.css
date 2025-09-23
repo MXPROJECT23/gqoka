@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@tailwindbase;
+@tailwindcomponents;
+@tailwindutilities;
 
 body {
   margin: 0;
