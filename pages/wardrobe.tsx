@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 interface Item {
   id: number;
@@ -13,21 +14,33 @@ export default function Wardrobe() {
   const [category, setCategory] = useState("");
   const [image, setImage] = useState("");
 
-  const handleAddItem = (e: React.FormEvent) => {
+  // Charger les vêtements depuis Supabase
+  useEffect(() => {
+    const fetchItems = async () => {
+      const { data, error } = await supabase.from("wardrobe").select("*");
+      if (error) console.error("Erreur Supabase :", error);
+      else setItems(data || []);
+    };
+    fetchItems();
+  }, []);
+
+  const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !category || !image) return;
 
-    const newItem: Item = {
-      id: Date.now(),
-      name,
-      category,
-      image,
-    };
+    const { data, error } = await supabase
+      .from("wardrobe")
+      .insert([{ name, category, image }])
+      .select();
 
-    setItems([...items, newItem]);
-    setName("");
-    setCategory("");
-    setImage("");
+    if (error) {
+      console.error("Erreur insertion :", error);
+    } else if (data) {
+      setItems([...items, data[0]]);
+      setName("");
+      setCategory("");
+      setImage("");
+    }
   };
 
   return (
@@ -106,3 +119,4 @@ export default function Wardrobe() {
     </div>
   );
 }
+
