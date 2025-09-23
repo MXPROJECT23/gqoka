@@ -15,36 +15,39 @@ export default function WeatherWidget() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Étape 1 : obtenir la position de l’utilisateur
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           const { latitude, longitude } = pos.coords;
-          console.log("📍 Localisation détectée :", latitude, longitude);
-
-          // Étape 2 : récupérer la météo via WeatherAPI
-          const data = await getWeather(`${latitude},${longitude}`);
-          if (!data) {
-            setError("Impossible de récupérer la météo.");
-          } else {
-            setWeather(data);
+          try {
+            const data = await getWeather(`${latitude},${longitude}`);
+            if (!data) {
+              setError("Impossible de récupérer la météo.");
+            } else {
+              setWeather(data);
+            }
+          } catch (e) {
+            setError("Erreur API météo.");
           }
           setLoading(false);
         },
-        (err) => {
-          console.error("Erreur géolocalisation:", err);
-          setError("Localisation refusée. Essayez Paris par défaut.");
+        () => {
+          setError("Localisation refusée. Météo par défaut : Paris.");
           setLoading(false);
+          // Fallback sur Paris si l'utilisateur refuse la localisation
+          getWeather("Paris").then((data) => {
+            if (data) setWeather(data);
+          });
         }
       );
     } else {
-      setError("La géolocalisation n'est pas supportée par ce navigateur.");
+      setError("Géolocalisation non supportée.");
       setLoading(false);
     }
   }, []);
 
   if (loading) return <p>⏳ Chargement de la météo...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (error && !weather) return <p className="text-red-500">{error}</p>;
   if (!weather) return null;
 
   return (
@@ -61,5 +64,6 @@ export default function WeatherWidget() {
     </div>
   );
 }
+
 
 
