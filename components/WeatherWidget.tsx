@@ -1,40 +1,39 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getWeather } from "../lib/weather";
 
-export default function WeatherWidget() {
-  const [weather, setWeather] = useState<any>(null);
+interface WeatherData {
+  current: {
+    temp_c: number;
+    condition: { text: string; icon: string };
+  };
+  location: { name: string; country: string };
+}
+
+export default function WeatherWidget({ city = "Paris" }: { city?: string }) {
+  const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=Paris&units=metric&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`
-        );
-        const data = await res.json();
-        setWeather(data);
-      } catch (err) {
-        console.error("Erreur météo :", err);
-      }
-    };
-    fetchWeather();
-  }, []);
+    async function fetchData() {
+      const data = await getWeather(city);
+      setWeather(data);
+    }
+    fetchData();
+  }, [city]);
 
-  if (!weather) {
-    return (
-      <div className="bg-gray-100 text-gray-600 rounded-xl p-4 mb-6">
-        Chargement météo...
-      </div>
-    );
-  }
+  if (!weather) return <p>Chargement météo...</p>;
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-4">
-      <span className="text-3xl">🌤️</span>
+    <div className="flex items-center space-x-3 bg-white shadow rounded-lg px-4 py-2">
+      <img src={weather.current.condition.icon} alt="icon" className="w-8 h-8" />
       <div>
-        <p className="font-semibold">{weather.name}</p>
-        <p>
-          {Math.round(weather.main.temp)}°C — {weather.weather[0].description}
+        <p className="font-medium">
+          {weather.location.name}, {weather.location.country}
+        </p>
+        <p className="text-sm text-gray-600">
+          {weather.current.temp_c}°C – {weather.current.condition.text}
         </p>
       </div>
     </div>
   );
 }
+
