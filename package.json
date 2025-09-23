@@ -1,8 +1,3 @@
-"devDependencies": {
-  "typescript": "latest",
-  "@types/react": "latest",
-  "@types/node": "latest"
-}
 {
   "name": "gqoka",
   "version": "1.0.0",
@@ -19,7 +14,10 @@
     "framer-motion": "latest"
   },
   "devDependencies": {
-    "typescript": "latest"
+    "typescript": "latest",
+    "@types/react": "latest",
+    "@types/node": "latest"
   }
 }
+
 
