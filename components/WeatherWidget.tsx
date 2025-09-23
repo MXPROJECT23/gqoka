@@ -9,18 +9,43 @@ interface WeatherData {
   location: { name: string; country: string };
 }
 
-export default function WeatherWidget({ city = "Paris" }: { city?: string }) {
+export default function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      const data = await getWeather(city);
-      setWeather(data);
-    }
-    fetchData();
-  }, [city]);
+    // Étape 1 : obtenir la position de l’utilisateur
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          console.log("📍 Localisation détectée :", latitude, longitude);
 
-  if (!weather) return <p>Chargement météo...</p>;
+          // Étape 2 : récupérer la météo via WeatherAPI
+          const data = await getWeather(`${latitude},${longitude}`);
+          if (!data) {
+            setError("Impossible de récupérer la météo.");
+          } else {
+            setWeather(data);
+          }
+          setLoading(false);
+        },
+        (err) => {
+          console.error("Erreur géolocalisation:", err);
+          setError("Localisation refusée. Essayez Paris par défaut.");
+          setLoading(false);
+        }
+      );
+    } else {
+      setError("La géolocalisation n'est pas supportée par ce navigateur.");
+      setLoading(false);
+    }
+  }, []);
+
+  if (loading) return <p>⏳ Chargement de la météo...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!weather) return null;
 
   return (
     <div className="flex items-center space-x-3 bg-white shadow rounded-lg px-4 py-2">
@@ -36,4 +61,5 @@ export default function WeatherWidget({ city = "Paris" }: { city?: string }) {
     </div>
   );
 }
+
 
