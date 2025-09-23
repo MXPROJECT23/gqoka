@@ -1,3 +1,6 @@
+import AnnaFloatingButton from "../components/AnnaFloatingButton";
+// ...dans le JSX :
+<AnnaFloatingButton />
 import Header from "../components/Header";
 import Hero from "../components/Hero";
 import { motion } from "framer-motion";
