@@ -1,3 +1,20 @@
-<meta property="og:title" content="GQOKA – Votre styliste IA" />
-<meta property="og:description" content="Des looks réellement portables, basés sur vos pièces." />
-<meta property="og:type" content="website" />
+import { Html, Head, Main, NextScript } from "next/document";
+
+export default function Document() {
+  return (
+    <Html lang="fr">
+      <Head>
+        {/* Police élégante */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+      <body className="bg-gray-50 text-gray-900">
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
+
