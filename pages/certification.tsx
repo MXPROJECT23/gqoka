@@ -8,27 +8,30 @@ export default function Certification() {
         <h1 className="text-3xl font-bold mb-6">Certification GQOKA</h1>
 
         <p className="mb-6 text-gray-700">
-          Donnez une nouvelle vie à vos vêtements grâce à la certification digitale GQOKA.
-          Chaque pièce reçoit un <strong>badge de confiance</strong> unique, garantissant son authenticité
-          et augmentant sa valeur lors de la revente.
+          La certification <strong>GQOKA</strong> donne à vos pièces une nouvelle valeur.
+          Chaque vêtement reçoit un <em>badge digital de confiance</em> garantissant son authenticité
+          et augmentant sa désirabilité sur le marché de la mode circulaire.
         </p>
 
         <div className="card space-y-4 p-6">
           <p className="text-gray-600">
-            📸 Importez les photos de votre article pour obtenir une certification instantanée.
+            📸 Importez les photos de votre pièce pour obtenir une pré-certification instantanée.
           </p>
-          <input type="file" accept="image/*" className="w-full border rounded p-2" />
+          <input type="file" accept="image/*" multiple className="w-full border rounded p-2" />
           <button className="btn w-full">Certifier mon vêtement</button>
         </div>
 
         <div className="mt-10 p-6 border rounded-lg bg-gray-50">
-          <h2 className="text-xl font-semibold mb-2">🎯 Avantage</h2>
-          <p>
-            Votre vêtement certifié devient un <em>actif numérique</em> : 
-            traçable, authentifié, et prêt à être revendu avec confiance.
-          </p>
+          <h2 className="text-xl font-semibold mb-2">🎯 Pourquoi certifier ?</h2>
+          <ul className="list-disc ml-5 space-y-2 text-gray-700">
+            <li>Gagner la confiance des acheteurs.</li>
+            <li>Augmenter la valeur perçue de vos pièces.</li>
+            <li>Assurer traçabilité et authenticité.</li>
+            <li>Préparer la revente avec badge digital et QR code.</li>
+          </ul>
         </div>
       </main>
     </>
   );
 }
+
