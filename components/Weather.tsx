@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 type WeatherData = {
   temp: number;
-  description: string;
+  condition: string;
   icon: string;
+  city: string;
 };
 
 export default function Weather() {
@@ -12,18 +13,17 @@ export default function Weather() {
   useEffect(() => {
     async function fetchWeather() {
       try {
-        const apiKey = process.env.NEXT_PUBLIC_WEATHER_KEY;
-        const city = "Paris"; // TODO: remplacer par localisation dynamique ou saisie utilisateur
-
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=fr`
-        );
+        const key = process.env.NEXT_PUBLIC_WEATHER_KEY;
+        // Pour le MVP : fixe sur Paris, FR
+        const url = `https://api.weatherapi.com/v1/current.json?key=${key}&q=Paris&lang=fr`;
+        const res = await fetch(url);
         const json = await res.json();
 
         const weather = {
-          temp: json.main.temp,
-          description: json.weather[0].description,
-          icon: `https://openweathermap.org/img/wn/${json.weather[0].icon}.png`,
+          temp: json.current.temp_c,
+          condition: json.current.condition.text,
+          icon: json.current.condition.icon,
+          city: json.location.name,
         };
         setData(weather);
       } catch (e) {
@@ -37,9 +37,10 @@ export default function Weather() {
 
   return (
     <div className="card flex items-center gap-3 text-sm w-fit">
-      <img src={data.icon} alt="icon" className="w-6 h-6" />
-      <span>{Math.round(data.temp)}°C</span>
-      <span className="capitalize">{data.description}</span>
+      <img src={data.icon} alt={data.condition} className="w-6 h-6" />
+      <span>{data.city} • {data.temp}°C</span>
+      <span className="capitalize text-gray-600">{data.condition}</span>
     </div>
   );
 }
+
