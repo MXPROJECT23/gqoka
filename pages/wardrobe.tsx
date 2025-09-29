@@ -1,17 +1,37 @@
 import { useState } from "react";
 import Header from "../components/Header";
 
-type Item = { name: string; type: string; color: string };
+type Clothing = {
+  id: number;
+  name: string;
+  photos: string[];
+};
 
 export default function Wardrobe() {
-  const [list, setList] = useState<Item[]>([]);
-  const [name, setName] = useState(""); const [type, setType] = useState(""); const [color, setColor] = useState("");
+  const [wardrobe, setWardrobe] = useState<Clothing[]>([]);
+  const [selectedPhotos, setSelectedPhotos] = useState<FileList | null>(null);
 
-  const add = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !type) return;
-    setList(prev => [...prev, { name, type, color }]);
-    setName(""); setType(""); setColor("");
+  const addClothing = () => {
+    if (wardrobe.length >= 10) {
+      alert("Limite de 10 vêtements atteinte pour la version MVP.");
+      return;
+    }
+
+    if (!selectedPhotos) return;
+
+    const photosArray = Array.from(selectedPhotos).map(file => URL.createObjectURL(file));
+
+    const newItem: Clothing = {
+      id: Date.now(),
+      name: `Pièce ${wardrobe.length + 1}`,
+      photos: photosArray,
+    };
+
+    setWardrobe([...wardrobe, newItem]);
+    setSelectedPhotos(null);
+
+    // Interaction avec Anna
+    alert(`✨ Anna : Belle pièce ajoutée ! Je vais pouvoir l'associer avec ta garde-robe existante.`);
   };
 
   return (
@@ -20,24 +40,32 @@ export default function Wardrobe() {
       <main className="container py-16">
         <h1 className="text-3xl font-bold mb-6">Ma garde-robe</h1>
 
-        <form onSubmit={add} className="card mb-6 grid md:grid-cols-4 gap-3">
-          <input className="border rounded-lg px-4 py-3" placeholder="Nom (ex: Chemise blanche)"
-                 value={name} onChange={e=>setName(e.target.value)} />
-          <input className="border rounded-lg px-4 py-3" placeholder="Type (chemise, jean...)"
-                 value={type} onChange={e=>setType(e.target.value)} />
-          <input className="border rounded-lg px-4 py-3" placeholder="Couleur"
-                 value={color} onChange={e=>setColor(e.target.value)} />
-          <button className="btn">Ajouter</button>
-        </form>
+        {/* Upload */}
+        <div className="card p-6 space-y-4">
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setSelectedPhotos(e.target.files)}
+            className="w-full border rounded p-2"
+          />
+          <button className="btn w-full" onClick={addClothing}>
+            Ajouter un vêtement
+          </button>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
-          {list.map((it, i) => (
-            <div key={i} className="card">
-              <div className="font-semibold">{it.name}</div>
-              <div className="text-sm text-gray-600">{it.type} • {it.color || "—"}</div>
+        {/* Liste des vêtements */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+          {wardrobe.map(item => (
+            <div key={item.id} className="card p-4 space-y-2">
+              <h2 className="font-semibold">{item.name}</h2>
+              <div className="grid grid-cols-3 gap-2">
+                {item.photos.map((photo, i) => (
+                  <img key={i} src={photo} alt="vêtement" className="rounded-lg object-cover w-full h-24" />
+                ))}
+              </div>
             </div>
           ))}
-          {list.length === 0 && <p className="text-gray-600">Ajoute tes premières pièces.</p>}
         </div>
       </main>
     </>
