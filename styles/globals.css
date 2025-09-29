@@ -2,37 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* -------------------------------
-   Typographie & Look Premium
---------------------------------*/
-html,
-body {
-  @apply bg-gray-50 text-gray-900 font-sans;
-  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-}
-
-/* Titres élégants */
-h1, h2, h3, h4 {
-  @apply font-extrabold tracking-tight text-gray-900;
-}
-
-/* Liens */
-a {
-  @apply text-blue-600 hover:text-blue-800 transition;
-}
-
-/* Boutons */
-button {
-  @apply rounded-full font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400;
-}
-
-/* Effet premium sur CTA */
-.btn-primary {
-  @apply px-6 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition;
-}
-
-/* Conteneur centralisé */
-.container {
-  @apply max-w-7xl mx-auto px-6;
-}
+/* UI sobre, lisible */
+html, body { @apply bg-white text-gray-900; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto; }
+a { @apply text-gray-900 hover:opacity-80; }
+.btn { @apply inline-flex items-center justify-center rounded-full px-5 py-3 bg-black text-white hover:opacity-90 transition; }
+.card { @apply rounded-2xl border border-gray-200 p-6 shadow-sm; }
+.container { @apply max-w-6xl mx-auto px-4; }
 
