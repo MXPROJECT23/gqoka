@@ -1,61 +1,44 @@
 import { useState } from "react";
+import Header from "../components/Header";
 
-type Msg = {
-  role: "user" | "assistant";
-  text: string;
-};
+type Msg = { role: "user" | "assistant"; text: string };
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>([
+    { role: "assistant", text: "Salut, je suis Anna. Décris ton occasion, je propose un look." }
+  ]);
   const [input, setInput] = useState("");
 
-  const sendMessage = () => {
+  const send = () => {
     if (!input.trim()) return;
-
-    // Ajoute le message utilisateur
-    const next: Msg[] = [...messages, { role: "user" as const, text: input }];
-
-    // Ajoute la réponse d’Anna (placeholder)
-    setMessages([
-      ...next,
-      {
-        role: "assistant" as const,
-        text: "Bien noté. Je te propose un look casual chic avec ta chemise blanche et ton jean brut."
-      }
-    ]);
-
+    const next: Msg[] = [...messages, { role: "user", text: input } as const];
+    const reply: Msg = { role: "assistant", text: "Look idée: chemise blanche, jean brut, sneakers blanches." };
+    setMessages([...next, reply]);
     setInput("");
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-1 p-4 overflow-y-auto space-y-2">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`p-2 rounded-lg ${
-              m.role === "user" ? "bg-blue-100 text-right" : "bg-gray-100 text-left"
-            }`}
-          >
-            {m.text}
+    <>
+      <Header />
+      <main className="container py-16">
+        <h1 className="text-3xl font-bold mb-6">Chat</h1>
+        <div className="card space-y-3">
+          <div className="h-64 overflow-y-auto space-y-2">
+            {messages.map((m, i) => (
+              <div key={i} className={`px-3 py-2 rounded-xl inline-block ${m.role==="user"?"bg-black text-white":"bg-gray-100"}`}>
+                {m.text}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="p-4 border-t flex space-x-2">
-        <input
-          className="flex-1 border p-2 rounded"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Écris à Anna..."
-        />
-        <button
-          onClick={sendMessage}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          Envoyer
-        </button>
-      </div>
-    </div>
+          <div className="flex gap-2">
+            <input className="flex-1 border rounded-lg px-4 py-3" value={input}
+                   onChange={e=>setInput(e.target.value)} placeholder="Décris l’occasion..." />
+            <button className="btn" onClick={send}>Envoyer</button>
+          </div>
+        </div>
+      </main>
+    </>
   );
 }
+
 
