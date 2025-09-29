@@ -9,13 +9,13 @@ type WeatherData = {
 
 export default function Weather() {
   const [data, setData] = useState<WeatherData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchWeather() {
+    async function fetchWeather(lat: number, lon: number) {
       try {
         const key = process.env.NEXT_PUBLIC_WEATHER_KEY;
-        // Pour le MVP : fixe sur Paris, FR
-        const url = `https://api.weatherapi.com/v1/current.json?key=${key}&q=Paris&lang=fr`;
+        const url = `https://api.weatherapi.com/v1/current.json?key=${key}&q=${lat},${lon}&lang=fr`;
         const res = await fetch(url);
         const json = await res.json();
 
@@ -28,11 +28,27 @@ export default function Weather() {
         setData(weather);
       } catch (e) {
         console.error("Erreur météo", e);
+        setError("Impossible de charger la météo.");
       }
     }
-    fetchWeather();
+
+    // Demander la localisation au navigateur
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          fetchWeather(latitude, longitude);
+        },
+        () => {
+          setError("Localisation refusée. Impossible d'afficher la météo.");
+        }
+      );
+    } else {
+      setError("La géolocalisation n'est pas supportée.");
+    }
   }, []);
 
+  if (error) return <p className="text-sm text-red-500">{error}</p>;
   if (!data) return <p className="text-sm text-gray-500">Chargement météo...</p>;
 
   return (
@@ -43,4 +59,5 @@ export default function Weather() {
     </div>
   );
 }
+
 
