@@ -4,17 +4,19 @@ export default function Document() {
   return (
     <Html lang="fr">
       <Head>
-        {/* Police élégante */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="icon" href="/favicon.svg" />
+        <meta name="theme-color" content="#0f0f0f" />
+        <meta name="description" content="GQOKA — Votre styliste et votre garde-robe digitale." />
+        <meta property="og:title" content="GQOKA" />
+        <meta property="og:description" content="Anna, styliste IA. Garde-robe capsule. Certification et revente." />
+        <meta property="og:type" content="website" />
       </Head>
-      <body className="bg-gray-50 text-gray-900">
+      <body className="min-h-screen flex flex-col">
         <Main />
         <NextScript />
       </body>
     </Html>
   );
 }
+
 
