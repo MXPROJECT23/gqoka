@@ -22,7 +22,7 @@ export default function Wardrobe() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Charger utilisateur et garde-robe
+  // Charger user et garde-robe
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
@@ -48,22 +48,13 @@ export default function Wardrobe() {
   };
 
   const add = async () => {
-    if (!userId) {
-      alert("Connecte-toi d'abord.");
-      return;
-    }
-    if (wardrobe.length >= 10) {
-      alert("Limite de 10 pièces atteinte.");
-      return;
-    }
-    if (files.length === 0) {
-      alert("Ajoute au moins une photo.");
-      return;
-    }
+    if (!userId) { alert("Connecte-toi d'abord."); return; }
+    if (wardrobe.length >= 10) { alert("Limite de 10 pièces atteinte."); return; }
+    if (files.length === 0) { alert("Ajoute au moins une photo."); return; }
 
     setLoading(true);
 
-    // 1️⃣ Upload photos dans Supabase Storage
+    // Upload photos → Supabase Storage
     const photoUrls: string[] = [];
     for (const f of files) {
       const path = `${userId}/${Date.now()}_${f.name}`;
@@ -74,7 +65,7 @@ export default function Wardrobe() {
       }
     }
 
-    // 2️⃣ Création en base
+    // Sauvegarde en base
     const newItem = {
       user_id: userId,
       name: `Pièce ${wardrobe.length + 1}`,
@@ -101,6 +92,17 @@ export default function Wardrobe() {
     alert("Pitch copié ✅");
   };
 
+  // Certification
+  const certify = async (id: string) => {
+    const { data, error } = await supabase.from("wardrobe").update({ certified: true }).eq("id", id).select();
+    if (!error && data) {
+      setWardrobe((prev) => prev.map(it => it.id === id ? { ...it, certified: true } : it));
+      alert("Vêtement certifié ✅");
+    } else {
+      alert("Erreur certification");
+    }
+  };
+
   return (
     <>
       <Header />
@@ -110,11 +112,10 @@ export default function Wardrobe() {
           <Weather />
         </div>
 
-        {/* Ajout */}
+        {/* Formulaire ajout vêtement */}
         <div className="card space-y-4 mb-10">
           <input type="file" accept="image/*" capture="environment" multiple onChange={handleFileChange} className="input" />
 
-          {/* Prévisualisation photos avant upload */}
           {files.length > 0 && (
             <div className="grid grid-cols-3 gap-2">
               {files.map((f, i) => (
@@ -136,7 +137,7 @@ export default function Wardrobe() {
           </button>
         </div>
 
-        {/* Liste */}
+        {/* Liste des vêtements */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {wardrobe.map((it) => (
             <div key={it.id} className="card space-y-3">
@@ -146,11 +147,15 @@ export default function Wardrobe() {
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Certifié</span>
                 )}
               </div>
+
+              {/* Photos */}
               <div className="grid grid-cols-3 gap-2">
                 {it.photos.map((p, i) => (
                   <img key={i} src={p} className="rounded-lg object-cover w-full h-24" alt="vêtement" />
                 ))}
               </div>
+
+              {/* Pitch + bouton copier */}
               {it.pitch && (
                 <div className="text-sm text-gray-600">
                   <p>{it.pitch}</p>
@@ -159,8 +164,21 @@ export default function Wardrobe() {
                   </button>
                 </div>
               )}
+
+              {/* Prix */}
               {it.price && <p className="text-sm font-medium">💶 Prix conseillé : {it.price} €</p>}
-              <button className="btn w-full bg-gray-100 text-gray-700 border">Préparer à la revente</button>
+
+              {/* Boutons actions */}
+              <div className="space-y-2">
+                {!it.certified && (
+                  <button className="btn w-full bg-green-600 text-white" onClick={() => certify(it.id)}>
+                    Demander la certification
+                  </button>
+                )}
+                <button className="btn w-full bg-gray-100 text-gray-700 border">
+                  Préparer à la revente
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -169,6 +187,7 @@ export default function Wardrobe() {
     </>
   );
 }
+
 
 
 
