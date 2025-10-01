@@ -16,11 +16,24 @@ type Clothing = {
 
 export default function Wardrobe() {
   const [wardrobe, setWardrobe] = useState<Clothing[]>([]);
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [price, setPrice] = useState<number | undefined>();
 
   const generatePitch = (name: string) => {
     return `✨ ${name} – une pièce intemporelle parfaite pour un look premium. Prête à entamer sa seconde vie et séduire un nouveau propriétaire.`;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const selected = Array.from(e.target.files);
+
+    // On limite à 3 photos
+    const limited = [...files, ...selected].slice(0, 3);
+    setFiles(limited);
+  };
+
+  const removePhoto = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const add = () => {
@@ -28,11 +41,12 @@ export default function Wardrobe() {
       alert("Limite de 10 pièces atteinte.");
       return;
     }
-    if (!files) return;
-    const photos = Array.from(files)
-      .slice(0, 3)
-      .map((f) => URL.createObjectURL(f));
+    if (files.length === 0) {
+      alert("Ajoute au moins une photo.");
+      return;
+    }
 
+    const photos = files.map((f) => URL.createObjectURL(f));
     const newItem: Clothing = {
       id: Date.now(),
       name: `Pièce ${wardrobe.length + 1}`,
@@ -42,7 +56,7 @@ export default function Wardrobe() {
     };
 
     setWardrobe((prev) => [...prev, newItem]);
-    setFiles(null);
+    setFiles([]);
     setPrice(undefined);
   };
 
@@ -67,9 +81,32 @@ export default function Wardrobe() {
             accept="image/*"
             capture="environment"
             multiple
-            onChange={(e) => setFiles(e.target.files)}
+            onChange={handleFileChange}
             className="input"
           />
+
+          {/* Aperçu des photos */}
+          {files.length > 0 && (
+            <div className="grid grid-cols-3 gap-2">
+              {files.map((f, i) => (
+                <div key={i} className="relative">
+                  <img
+                    src={URL.createObjectURL(f)}
+                    className="rounded-lg object-cover w-full h-24"
+                    alt="aperçu"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    className="absolute top-1 right-1 bg-black text-white text-xs px-2 py-0.5 rounded-full"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <input
             type="number"
             placeholder="Prix indicatif (€)"
@@ -77,6 +114,7 @@ export default function Wardrobe() {
             onChange={(e) => setPrice(parseInt(e.target.value))}
             className="input"
           />
+
           <button className="btn w-full" onClick={add}>
             Ajouter un vêtement
           </button>
@@ -138,3 +176,4 @@ export default function Wardrobe() {
     </>
   );
 }
+
