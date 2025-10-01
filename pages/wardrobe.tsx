@@ -21,6 +21,7 @@ export default function Wardrobe() {
   const [price, setPrice] = useState<number | undefined>();
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [adText, setAdText] = useState<string | null>(null);
 
   // Charger user et garde-robe
   useEffect(() => {
@@ -87,9 +88,9 @@ export default function Wardrobe() {
     }
   };
 
-  const copyPitch = (text: string) => {
+  const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert("Pitch copié ✅");
+    alert("Texte copié ✅");
   };
 
   // Certification
@@ -98,9 +99,13 @@ export default function Wardrobe() {
     if (!error && data) {
       setWardrobe((prev) => prev.map(it => it.id === id ? { ...it, certified: true } : it));
       alert("Vêtement certifié ✅");
-    } else {
-      alert("Erreur certification");
     }
+  };
+
+  // Préparer annonce de revente
+  const prepareAd = (item: Clothing) => {
+    const ad = `🛍️ ${item.name}\n\n${item.pitch}\n\n💶 Prix conseillé : ${item.price || "à définir"} €\n📦 Expédition rapide\n#GQOKA #SecondeVie #Style`;
+    setAdText(ad);
   };
 
   return (
@@ -159,7 +164,7 @@ export default function Wardrobe() {
               {it.pitch && (
                 <div className="text-sm text-gray-600">
                   <p>{it.pitch}</p>
-                  <button onClick={() => copyPitch(it.pitch!)} className="text-xs text-blue-600 underline mt-1">
+                  <button onClick={() => copyText(it.pitch!)} className="text-xs text-blue-600 underline mt-1">
                     📋 Copier le pitch
                   </button>
                 </div>
@@ -175,19 +180,32 @@ export default function Wardrobe() {
                     Demander la certification
                   </button>
                 )}
-                <button className="btn w-full bg-gray-100 text-gray-700 border">
+                <button className="btn w-full bg-gray-100 text-gray-700 border" onClick={() => prepareAd(it)}>
                   Préparer à la revente
                 </button>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Popup annonce */}
+        {adText && (
+          <div className="fixed bottom-4 right-4 bg-white border rounded-xl shadow-lg p-4 w-80 space-y-3">
+            <h3 className="font-semibold">Annonce générée</h3>
+            <pre className="text-sm whitespace-pre-wrap">{adText}</pre>
+            <button className="btn w-full" onClick={() => copyText(adText)}>
+              📋 Copier l’annonce
+            </button>
+            <button className="btn w-full bg-gray-200 text-gray-700" onClick={() => setAdText(null)}>
+              Fermer
+            </button>
+          </div>
+        )}
       </main>
       <Footer />
     </>
   );
 }
-
 
 
 
