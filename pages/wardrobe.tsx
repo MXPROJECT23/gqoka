@@ -20,8 +20,9 @@ export default function Wardrobe() {
   const [files, setFiles] = useState<File[]>([]);
   const [price, setPrice] = useState<number | undefined>();
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Charger user et garde-robe
+  // Charger utilisateur et garde-robe
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
@@ -37,39 +38,61 @@ export default function Wardrobe() {
   };
 
   const generatePitch = (name: string) => {
-    return `✨ ${name} — une pièce intemporelle validée par Anna. Je te recommande de l’associer avec un jean brut et des sneakers minimalistes pour un look moderne.`;
+    return `✨ ${name} — une pièce intemporelle validée par Anna. Associez-la avec un jean brut et des sneakers minimalistes pour un look moderne.`;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const selected = Array.from(e.target.files);
-    setFiles((prev) => [...prev, ...selected].slice(0, 3));
+    setFiles((prev) => [...prev, ...selected].slice(0, 3)); // max 3 photos
   };
 
   const add = async () => {
-    if (!userId) { alert("Connecte-toi d'abord."); return; }
-    if (wardrobe.length >= 10) { alert("Limite de 10 pièces atteinte."); return; }
-    if (files.length === 0) { alert("Ajoute au moins une photo."); return; }
+    if (!userId) {
+      alert("Connecte-toi d'abord.");
+      return;
+    }
+    if (wardrobe.length >= 10) {
+      alert("Limite de 10 pièces atteinte.");
+      return;
+    }
+    if (files.length === 0) {
+      alert("Ajoute au moins une photo.");
+      return;
+    }
 
-    const photos = files.map((f) => URL.createObjectURL(f)); // preview local
-    const newItem: Omit<Clothing, "id"> = {
+    setLoading(true);
+
+    // 1️⃣ Upload photos dans Supabase Storage
+    const photoUrls: string[] = [];
+    for (const f of files) {
+      const path = `${userId}/${Date.now()}_${f.name}`;
+      const { error } = await supabase.storage.from("wardrobe").upload(path, f, { upsert: true });
+      if (!error) {
+        const { data } = supabase.storage.from("wardrobe").getPublicUrl(path);
+        photoUrls.push(data.publicUrl);
+      }
+    }
+
+    // 2️⃣ Création en base
+    const newItem = {
+      user_id: userId,
       name: `Pièce ${wardrobe.length + 1}`,
-      photos,
+      photos: photoUrls,
       price,
       pitch: generatePitch(`Pièce ${wardrobe.length + 1}`),
       certified: false,
     };
 
-    // Sauvegarde dans Supabase
-    const { data, error } = await supabase
-      .from("wardrobe")
-      .insert([{ ...newItem, user_id: userId }])
-      .select();
+    const { data, error } = await supabase.from("wardrobe").insert([newItem]).select();
+    setLoading(false);
 
     if (!error && data) {
       setWardrobe((prev) => [...prev, data[0]]);
       setFiles([]);
       setPrice(undefined);
+    } else {
+      alert("Erreur lors de l’ajout.");
     }
   };
 
@@ -90,6 +113,8 @@ export default function Wardrobe() {
         {/* Ajout */}
         <div className="card space-y-4 mb-10">
           <input type="file" accept="image/*" capture="environment" multiple onChange={handleFileChange} className="input" />
+
+          {/* Prévisualisation photos avant upload */}
           {files.length > 0 && (
             <div className="grid grid-cols-3 gap-2">
               {files.map((f, i) => (
@@ -97,6 +122,7 @@ export default function Wardrobe() {
               ))}
             </div>
           )}
+
           <input
             type="number"
             placeholder="Prix indicatif (€)"
@@ -104,7 +130,10 @@ export default function Wardrobe() {
             onChange={(e) => setPrice(parseInt(e.target.value))}
             className="input"
           />
-          <button className="btn w-full" onClick={add}>Ajouter un vêtement</button>
+
+          <button className="btn w-full" onClick={add} disabled={loading}>
+            {loading ? "Ajout en cours…" : "Ajouter un vêtement"}
+          </button>
         </div>
 
         {/* Liste */}
@@ -140,5 +169,6 @@ export default function Wardrobe() {
     </>
   );
 }
+
 
 
