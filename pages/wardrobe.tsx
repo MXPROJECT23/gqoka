@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { supabase } from "../lib/supabaseClient";
 import dynamic from "next/dynamic";
 
 const Weather = dynamic(() => import("../components/Weather"), { ssr: false });
 
 type Clothing = {
-  id: number;
+  id: string;
   name: string;
   photos: string[];
   price?: number;
@@ -18,46 +19,58 @@ export default function Wardrobe() {
   const [wardrobe, setWardrobe] = useState<Clothing[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [price, setPrice] = useState<number | undefined>();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Charger user et garde-robe
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUserId(data.user.id);
+        loadWardrobe(data.user.id);
+      }
+    });
+  }, []);
+
+  const loadWardrobe = async (uid: string) => {
+    const { data, error } = await supabase.from("wardrobe").select("*").eq("user_id", uid);
+    if (!error && data) setWardrobe(data);
+  };
 
   const generatePitch = (name: string) => {
-    return `✨ ${name} – une pièce intemporelle parfaite pour un look premium. Prête à entamer sa seconde vie et séduire un nouveau propriétaire.`;
+    return `✨ ${name} — une pièce intemporelle validée par Anna. Je te recommande de l’associer avec un jean brut et des sneakers minimalistes pour un look moderne.`;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const selected = Array.from(e.target.files);
-
-    // On limite à 3 photos
-    const limited = [...files, ...selected].slice(0, 3);
-    setFiles(limited);
+    setFiles((prev) => [...prev, ...selected].slice(0, 3));
   };
 
-  const removePhoto = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-  };
+  const add = async () => {
+    if (!userId) { alert("Connecte-toi d'abord."); return; }
+    if (wardrobe.length >= 10) { alert("Limite de 10 pièces atteinte."); return; }
+    if (files.length === 0) { alert("Ajoute au moins une photo."); return; }
 
-  const add = () => {
-    if (wardrobe.length >= 10) {
-      alert("Limite de 10 pièces atteinte.");
-      return;
-    }
-    if (files.length === 0) {
-      alert("Ajoute au moins une photo.");
-      return;
-    }
-
-    const photos = files.map((f) => URL.createObjectURL(f));
-    const newItem: Clothing = {
-      id: Date.now(),
+    const photos = files.map((f) => URL.createObjectURL(f)); // preview local
+    const newItem: Omit<Clothing, "id"> = {
       name: `Pièce ${wardrobe.length + 1}`,
       photos,
       price,
       pitch: generatePitch(`Pièce ${wardrobe.length + 1}`),
+      certified: false,
     };
 
-    setWardrobe((prev) => [...prev, newItem]);
-    setFiles([]);
-    setPrice(undefined);
+    // Sauvegarde dans Supabase
+    const { data, error } = await supabase
+      .from("wardrobe")
+      .insert([{ ...newItem, user_id: userId }])
+      .select();
+
+    if (!error && data) {
+      setWardrobe((prev) => [...prev, data[0]]);
+      setFiles([]);
+      setPrice(undefined);
+    }
   };
 
   const copyPitch = (text: string) => {
@@ -74,39 +87,16 @@ export default function Wardrobe() {
           <Weather />
         </div>
 
-        {/* Formulaire ajout vêtement */}
+        {/* Ajout */}
         <div className="card space-y-4 mb-10">
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            multiple
-            onChange={handleFileChange}
-            className="input"
-          />
-
-          {/* Aperçu des photos */}
+          <input type="file" accept="image/*" capture="environment" multiple onChange={handleFileChange} className="input" />
           {files.length > 0 && (
             <div className="grid grid-cols-3 gap-2">
               {files.map((f, i) => (
-                <div key={i} className="relative">
-                  <img
-                    src={URL.createObjectURL(f)}
-                    className="rounded-lg object-cover w-full h-24"
-                    alt="aperçu"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(i)}
-                    className="absolute top-1 right-1 bg-black text-white text-xs px-2 py-0.5 rounded-full"
-                  >
-                    ✕
-                  </button>
-                </div>
+                <img key={i} src={URL.createObjectURL(f)} className="rounded-lg object-cover w-full h-24" alt="aperçu" />
               ))}
             </div>
           )}
-
           <input
             type="number"
             placeholder="Prix indicatif (€)"
@@ -114,60 +104,34 @@ export default function Wardrobe() {
             onChange={(e) => setPrice(parseInt(e.target.value))}
             className="input"
           />
-
-          <button className="btn w-full" onClick={add}>
-            Ajouter un vêtement
-          </button>
+          <button className="btn w-full" onClick={add}>Ajouter un vêtement</button>
         </div>
 
-        {/* Liste des vêtements */}
+        {/* Liste */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {wardrobe.map((it) => (
             <div key={it.id} className="card space-y-3">
               <div className="flex justify-between items-center">
                 <div className="font-semibold">{it.name}</div>
                 {it.certified && (
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                    Certifié
-                  </span>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Certifié</span>
                 )}
               </div>
-
-              {/* Photos */}
               <div className="grid grid-cols-3 gap-2">
                 {it.photos.map((p, i) => (
-                  <img
-                    key={i}
-                    src={p}
-                    className="rounded-lg object-cover w-full h-24"
-                    alt="vêtement"
-                  />
+                  <img key={i} src={p} className="rounded-lg object-cover w-full h-24" alt="vêtement" />
                 ))}
               </div>
-
-              {/* Pitch + bouton copier */}
               {it.pitch && (
                 <div className="text-sm text-gray-600">
                   <p>{it.pitch}</p>
-                  <button
-                    onClick={() => copyPitch(it.pitch!)}
-                    className="text-xs text-blue-600 underline mt-1"
-                  >
+                  <button onClick={() => copyPitch(it.pitch!)} className="text-xs text-blue-600 underline mt-1">
                     📋 Copier le pitch
                   </button>
                 </div>
               )}
-
-              {/* Prix */}
-              {it.price && (
-                <p className="text-sm font-medium">
-                  💶 Prix conseillé : {it.price} €
-                </p>
-              )}
-
-              <button className="btn w-full bg-gray-100 text-gray-700 border">
-                Préparer à la revente
-              </button>
+              {it.price && <p className="text-sm font-medium">💶 Prix conseillé : {it.price} €</p>}
+              <button className="btn w-full bg-gray-100 text-gray-700 border">Préparer à la revente</button>
             </div>
           ))}
         </div>
@@ -176,4 +140,5 @@ export default function Wardrobe() {
     </>
   );
 }
+
 
