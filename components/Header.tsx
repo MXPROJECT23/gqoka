@@ -1,39 +1,57 @@
 import Link from "next/link";
-import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setUser(data.user);
+    });
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.push("/login");
+  };
+
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/80 backdrop-blur">
-      <div className="container h-16 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-extrabold tracking-tight">GQOKA</Link>
+    <header className="w-full border-b bg-white fixed top-0 left-0 z-50">
+      <div className="container mx-auto flex justify-between items-center px-4 py-3">
+        {/* Logo */}
+        <Link href="/" className="font-bold text-xl">
+          GQOKA
+        </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/wardrobe" className="hover:opacity-80">Garde-robe</Link>
-          <Link href="/chat" className="hover:opacity-80">Chat</Link>
-          <Link href="/profile" className="hover:opacity-80">Profil</Link>
-          <Link href="/login" className="btn">Connexion</Link>
+        {/* Menu */}
+        <nav className="flex items-center gap-6 text-sm font-medium">
+          <Link href="/wardrobe">Garde-robe</Link>
+          <Link href="/chat">Chat</Link>
+          <Link href="/profil">Profil</Link>
+
+          {/* Déconnexion si connecté */}
+          {user ? (
+            <button
+              onClick={handleLogout}
+              title="Déconnexion"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+            >
+              🚪
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition"
+            >
+              Connexion
+            </Link>
+          )}
         </nav>
-
-        {/* Mobile hamburger */}
-        <button aria-label="Menu" onClick={()=>setOpen(v=>!v)} className="md:hidden p-2 rounded-lg border">
-          ☰
-        </button>
       </div>
-
-      {/* Mobile drawer */}
-      {open && (
-        <div className="md:hidden border-t bg-white">
-          <div className="container py-3">
-            <Link href="/wardrobe" className="nav-link" onClick={()=>setOpen(false)}>Garde-robe</Link>
-            <Link href="/chat" className="nav-link" onClick={()=>setOpen(false)}>Chat</Link>
-            <Link href="/profile" className="nav-link" onClick={()=>setOpen(false)}>Profil</Link>
-            <Link href="/login" className="nav-link" onClick={()=>setOpen(false)}>Connexion</Link>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
-
