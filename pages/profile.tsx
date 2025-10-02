@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { useRouter } from "next/router";
 
 export default function Profile() {
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
 
+  // Récupération du user
   useEffect(() => {
     const getUser = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -18,7 +21,7 @@ export default function Profile() {
 
       if (data?.user) {
         setUser(data.user);
-        setEmail(data.user.email || ""); // ✅ fallback si undefined
+        setEmail(data.user.email || ""); // fallback si undefined
         setUsername(data.user.user_metadata?.username || "");
         setAvatarUrl(data.user.user_metadata?.avatar_url || "");
       } else {
@@ -29,6 +32,7 @@ export default function Profile() {
     getUser();
   }, []);
 
+  // Mise à jour du profil
   const handleUpdateProfile = async () => {
     if (!user) return;
 
@@ -39,7 +43,17 @@ export default function Profile() {
     if (error) {
       alert("Erreur mise à jour profil : " + error.message);
     } else {
-      alert("Profil mis à jour ✅");
+      alert("✅ Profil mis à jour avec succès !");
+    }
+  };
+
+  // Déconnexion
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      alert("Erreur déconnexion : " + error.message);
+    } else {
+      router.push("/"); // redirection vers la page d’accueil
     }
   };
 
@@ -48,7 +62,7 @@ export default function Profile() {
       <h1 className="text-2xl font-bold mb-6">Mon Profil</h1>
 
       {user ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Email (lecture seule) */}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
@@ -89,6 +103,14 @@ export default function Profile() {
           >
             Mettre à jour
           </button>
+
+          {/* Bouton déconnexion */}
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-600 text-white py-2 rounded font-semibold hover:bg-red-700"
+          >
+            Se déconnecter
+          </button>
         </div>
       ) : (
         <p>Veuillez vous connecter pour voir votre profil.</p>
@@ -96,4 +118,5 @@ export default function Profile() {
     </main>
   );
 }
+
 
