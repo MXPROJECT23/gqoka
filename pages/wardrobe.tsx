@@ -2,29 +2,32 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 import PhotoUploader from "@/components/PhotoUploader";
 import { supabase } from "@/lib/supabaseClient";
+import { getWeather, weatherAdvice } from "@/lib/weather";
 
 type Item = { id: string; name: string; category: string; color?: string; image_url?: string };
 
 export default function Wardrobe() {
   const [items, setItems] = useState<Item[]>([]);
   const [email, setEmail] = useState<string | null>(null);
+  const [weatherText, setWeatherText] = useState<string>("");
+
   const bucket = "wardrobe";
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+    // météo Paris par défaut
+    getWeather(48.8566, 2.3522).then((w) => setWeatherText(weatherAdvice(w)));
   }, []);
 
   const addItem = async (file: File) => {
     if (!email) { alert("Connecte-toi d'abord."); return; }
-
     const filePath = `${email}/${Date.now()}-${file.name}`;
-    const { error: upErr } = await supabase.storage.from(bucket).upload(filePath, file, { upsert: false });
-    if (upErr) { alert(upErr.message); return; }
-
+    const { error } = await supabase.storage.from(bucket).upload(filePath, file);
+    if (error) { alert(error.message); return; }
     const { data: publicUrl } = supabase.storage.from(bucket).getPublicUrl(filePath);
 
     const res = await fetch("/api/anna-classify", { method: "POST", body: await file.arrayBuffer() });
-    const meta = await res.json(); // { name, category, color }
+    const meta = await res.json();
 
     const newItem: Item = {
       id: crypto.randomUUID(),
@@ -36,11 +39,21 @@ export default function Wardrobe() {
     setItems((prev) => [newItem, ...prev]);
   };
 
+  const revendre = async (item: Item) => {
+    const res = await fetch("/api/revente", {
+      method: "POST",
+      body: JSON.stringify(item)
+    });
+    const { texte, hashtags } = await res.json();
+    alert(`Texte prêt : \n\n${texte}\n\n${hashtags}`);
+  };
+
   return (
     <>
       <Head><title>Garde-robe — GQOKA</title></Head>
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Ma garde-robe</h1>
+        <h1 className="text-2xl font-bold mb-4">Ma garde-robe avec Anna</h1>
+        <p className="text-gray-600 mb-6">Anna dit : {weatherText}</p>
 
         {!email ? (
           <p className="text-gray-600">Connecte-toi pour ajouter des articles.</p>
@@ -68,6 +81,9 @@ export default function Wardrobe() {
                     <button className="px-3 py-1 border rounded-lg text-sm">Éditer</button>
                     <button className="px-3 py-1 border rounded-lg text-sm">Favori</button>
                     <button className="px-3 py-1 border rounded-lg text-sm">Partager</button>
+                    <button className="px-3 py-1 border rounded-lg text-sm bg-gray-100" onClick={() => revendre(it)}>
+                      Revendre
+                    </button>
                   </div>
                 </li>
               ))}
@@ -78,4 +94,3 @@ export default function Wardrobe() {
     </>
   );
 }
-
