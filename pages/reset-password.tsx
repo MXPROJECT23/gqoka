@@ -11,11 +11,14 @@ export default function ResetPassword() {
     e.preventDefault();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://gqoka.com/update-password", // page où l'utilisateur va définir un nouveau mot de passe
+      redirectTo: "https://gqoka.com/update-password", // page de redirection
     });
 
-    if (error) setMessage(error.message);
-    else setMessage("Un email de réinitialisation a été envoyé.");
+    if (error) {
+      setMessage("Erreur : " + error.message);
+    } else {
+      setMessage("Un email de réinitialisation vient d’être envoyé.");
+    }
   };
 
   return (
@@ -30,7 +33,6 @@ export default function ResetPassword() {
           </h1>
 
           <form onSubmit={handleReset} className="space-y-4">
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
@@ -38,22 +40,21 @@ export default function ResetPassword() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="nom@exemple.com"
                 className="w-full border rounded-lg px-3 py-2"
-                placeholder="exemple@email.com"
               />
             </div>
 
-            {/* Bouton */}
             <button
               type="submit"
               className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
             >
-              Envoyer un lien de réinitialisation
+              Envoyer le lien de réinitialisation
             </button>
           </form>
 
           {message && (
-            <p className="mt-4 text-center text-sm text-red-500">{message}</p>
+            <p className="mt-4 text-center text-sm text-gray-600">{message}</p>
           )}
         </div>
       </main>
