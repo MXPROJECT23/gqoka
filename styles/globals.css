@@ -2,15 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { --brand:#0a0a0a; --ink:#111; --muted:#6b7280; }
-html,body,#__next { height: 100%; }
-body { @apply bg-white text-[15px] text-gray-900 antialiased; }
+@layer utilities {
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in-delay {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in-delay2 {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-/* UI */
-.btn { @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition; }
-.link { @apply underline underline-offset-4 hover:no-underline; }
-.card { @apply rounded-2xl border border-gray-200 p-4 shadow-sm; }
-.grid-auto { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+  .animate-fade-in {
+    animation: fade-in 0.8s ease-out forwards;
+  }
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1.2s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+  .animate-fade-in-delay2 {
+    animation: fade-in-delay2 1.5s ease-out forwards;
+    animation-delay: 0.6s;
+  }
+}
 
-/* Accessibility focus */
-:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
