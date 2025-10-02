@@ -1,14 +1,15 @@
-import "../styles/globals.css";
+import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import dynamic from "next/dynamic";
-
-const RgpdBanner = dynamic(() => import("../components/RgpdBanner"), { ssr: false });
+import Header from "@/components/Header";
+import AnnaBubble from "@/components/AnnaBubble";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
+      <Header />
       <Component {...pageProps} />
-      <RgpdBanner />
+      <AnnaBubble />
     </>
   );
 }
+
