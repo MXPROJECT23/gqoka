@@ -1,63 +1,75 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import dynamic from "next/dynamic";
-
-const Weather = dynamic(() => import("../components/Weather"), { ssr: false });
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <>
-      <Header />
-      <main className="container py-14 md:py-20">
-        {/* Hero */}
-        <section className="grid md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-6 text-center md:text-left">
-            <div className="flex justify-center md:justify-start">
-              <Weather />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-              Votre styliste. <br className="hidden md:block" />
-              Votre garde-robe digitale.
-            </h1>
-            <p className="text-gray-600 text-lg md:text-xl">
-              Ajoutez vos pièces, recevez des looks instantanés d’Anna, valorisez vos vêtements avec la certification.
+    <main className="relative min-h-screen bg-white text-black">
+      {/* Hero */}
+      <section className="relative flex flex-col items-center justify-center text-center min-h-screen px-6">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?auto=format&fit=crop&w=1400&q=80')",
+          }}
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-3xl">
+          <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
+            Votre garde-robe <br /> <span className="text-[#FFD700]">réinventée</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-200 mb-10">
+            Découvrez <strong>Anna</strong>, votre styliste intelligent.  
+            Organisez vos vêtements, créez vos looks, et redonnez une seconde vie à vos articles.
+          </p>
+
+          <div className="flex justify-center gap-4">
+            <Link
+              href="/wardrobe"
+              className="px-6 py-3 bg-[#FFD700] text-black rounded-full font-semibold shadow-md hover:bg-yellow-400 transition"
+            >
+              ✨ Commencer
+            </Link>
+            <Link
+              href="/a-propos"
+              className="px-6 py-3 border border-white text-white rounded-full font-semibold hover:bg-white hover:text-black transition"
+            >
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section valeur ajoutée */}
+      <section className="py-20 px-6 text-center max-w-5xl mx-auto space-y-12">
+        <h2 className="text-3xl font-bold">Pourquoi choisir GQOKA ?</h2>
+
+        <div className="grid md:grid-cols-3 gap-10 mt-10">
+          <div className="space-y-3">
+            <div className="text-5xl">👗</div>
+            <h3 className="text-xl font-semibold">Votre styliste perso</h3>
+            <p className="text-gray-600">
+              Anna analyse vos vêtements et vous propose des looks adaptés à votre style.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:justify-start justify-center">
-              <a href="/signup" className="btn w-full sm:w-auto">Créer un compte</a>
-              <a href="/wardrobe" className="btn-outline w-full sm:w-auto">Voir ma garde-robe</a>
-            </div>
-            <p className="text-xs text-gray-500">Gratuit pour l’utilisateur.</p>
           </div>
-
-          {/* Visuel hero */}
-          <div className="order-first md:order-last">
-            <div className="aspect-[4/5] rounded-2xl border shadow-sm bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-5xl">👗</div>
-                <p className="mt-2 text-sm text-gray-600">Capsule 10 pièces • Looks par Anna</p>
-              </div>
-            </div>
+          <div className="space-y-3">
+            <div className="text-5xl">♻️</div>
+            <h3 className="text-xl font-semibold">Seconde vie</h3>
+            <p className="text-gray-600">
+              Donnez une nouvelle chance à vos vêtements avec un pitch prêt à copier-coller.
+            </p>
           </div>
-        </section>
-
-        {/* Avantages */}
-        <section className="grid md:grid-cols-3 gap-6 mt-16">
-          <div className="card">
-            <h3 className="font-semibold mb-2">Ajout ultra simple</h3>
-            <p className="text-sm text-gray-600">Caméra mobile intégrée. 3 photos par pièce. Capsule ≤ 10.</p>
+          <div className="space-y-3">
+            <div className="text-5xl">🌍</div>
+            <h3 className="text-xl font-semibold">Mode responsable</h3>
+            <p className="text-gray-600">
+              Moins de gaspillage, plus de style. Une consommation plus consciente et inspirante.
+            </p>
           </div>
-          <div className="card">
-            <h3 className="font-semibold mb-2">Anna, styliste premium</h3>
-            <p className="text-sm text-gray-600">Looks adaptés à vous et à la météo, ton mode élégant.</p>
-          </div>
-          <div className="card">
-            <h3 className="font-semibold mb-2">Certification & revente</h3>
-            <p className="text-sm text-gray-600">Badge digital de confiance. Pitch copiable. Prix indicatif.</p>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+        </div>
+      </section>
+    </main>
   );
 }
 
