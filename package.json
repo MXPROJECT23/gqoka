@@ -1,23 +1,33 @@
 {
-  "name": "gqoka",
-  "version": "1.0.0",
+  "name": "gqoka-mvp",
+  "version": "0.2.0",
   "private": true,
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
   "dependencies": {
-    "@supabase/supabase-js": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "next": "14.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "autoprefixer": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest",
-    "typescript": "latest"
+    "@netlify/plugin-nextjs": "^5.8.0",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8.4.38",
+    "prettier": "^3.3.2",
+    "tailwindcss": "^3.4.9",
+    "typescript": "^5.5.4"
   }
 }
-
 
 
