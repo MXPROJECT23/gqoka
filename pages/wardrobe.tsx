@@ -14,13 +14,34 @@ export default function Wardrobe() {
   const bucket = "wardrobe";
 
   useEffect(() => {
+    // Vérifie si utilisateur connecté
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
-    // météo Paris par défaut
-    getWeather(48.8566, 2.3522).then((w) => setWeatherText(weatherAdvice(w)));
+
+    // Geoloc utilisateur → météo
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const w = await getWeather(pos.coords.latitude, pos.coords.longitude);
+            setWeatherText(weatherAdvice(w));
+          } catch {
+            setWeatherText("Anna ne peut pas lire la météo pour le moment.");
+          }
+        },
+        () => {
+          // fallback Paris
+          getWeather(48.8566, 2.3522).then((w) => setWeatherText(weatherAdvice(w)));
+        }
+      );
+    } else {
+      // fallback si pas de geoloc
+      getWeather(48.8566, 2.3522).then((w) => setWeatherText(weatherAdvice(w)));
+    }
   }, []);
 
   const addItem = async (file: File) => {
     if (!email) { alert("Connecte-toi d'abord."); return; }
+
     const filePath = `${email}/${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from(bucket).upload(filePath, file);
     if (error) { alert(error.message); return; }
@@ -45,7 +66,7 @@ export default function Wardrobe() {
       body: JSON.stringify(item)
     });
     const { texte, hashtags } = await res.json();
-    alert(`Texte prêt : \n\n${texte}\n\n${hashtags}`);
+    alert(`Texte prêt pour ta revente :\n\n${texte}\n\n${hashtags}`);
   };
 
   return (
