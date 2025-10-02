@@ -13,9 +13,10 @@ export default function UpdatePassword() {
     e.preventDefault();
 
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) setMessage(error.message);
-    else {
-      setMessage("Mot de passe mis à jour avec succès.");
+    if (error) {
+      setMessage("Erreur : " + error.message);
+    } else {
+      setMessage("Mot de passe mis à jour avec succès !");
       setTimeout(() => router.push("/login"), 2000);
     }
   };
