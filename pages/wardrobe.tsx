@@ -1,57 +1,59 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
-import { useRouter } from "next/router";
+import { useState } from "react";
+import Head from "next/head";
+import PhotoUploader from "@/components/PhotoUploader";
+
+type Item = { id: string; name: string; category: string; color?: string };
 
 export default function Wardrobe() {
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [type, setType] = useState("");
-  const [size, setSize] = useState("");
-  const [color, setColor] = useState("");
-  const [brand, setBrand] = useState("");
+  const [items, setItems] = useState<Item[]>([]);
 
-  // Vérification connexion
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
-        router.push("/auth");
-      } else {
-        setUser(data.user);
-      }
+  const addItem = async (file: File) => {
+    // TODO: remplacer par appel Supabase Storage + fonction d'inférence d'Anna
+    const tmp: Item = {
+      id: crypto.randomUUID(),
+      name: "Vêtement ajouté",
+      category: "à classer",
+      color: "à détecter"
     };
-    checkUser();
-  }, [router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    const { error } = await supabase.from("wardrobe").insert([
-      { type, size, color, brand, user_id: user.id }
-    ]);
-
-    if (error) {
-      alert("❌ Erreur : " + error.message);
-    } else {
-      alert("✅ Vêtement ajouté !");
-      setType(""); setSize(""); setColor(""); setBrand("");
-    }
+    setItems((prev) => [tmp, ...prev]);
   };
 
-  if (!user) return <p className="p-6">Vérification de la session...</p>;
-
   return (
-    <main className="container mx-auto px-6 py-12 max-w-md">
-      <h1 className="text-2xl font-bold mb-6">Ajouter un vêtement</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" placeholder="Type" value={type} onChange={(e) => setType(e.target.value)} className="w-full border rounded px-3 py-2"/>
-        <input type="text" placeholder="Taille" value={size} onChange={(e) => setSize(e.target.value)} className="w-full border rounded px-3 py-2"/>
-        <input type="text" placeholder="Couleur" value={color} onChange={(e) => setColor(e.target.value)} className="w-full border rounded px-3 py-2"/>
-        <input type="text" placeholder="Marque" value={brand} onChange={(e) => setBrand(e.target.value)} className="w-full border rounded px-3 py-2"/>
-        <button type="submit" className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">Ajouter</button>
-      </form>
-    </main>
+    <>
+      <Head><title>Garde-robe — GQOKA</title></Head>
+      <main className="mx-auto max-w-6xl px-4 py-8">
+        <h1 className="text-2xl font-bold mb-6">Ma garde-robe</h1>
+
+        <PhotoUploader onSelected={addItem} />
+
+        <div className="mt-8">
+          <h2 className="font-semibold mb-3">Mes articles</h2>
+          {items.length === 0 ? (
+            <p className="text-gray-500">Ajoutez votre premier article.</p>
+          ) : (
+            <ul className="grid-auto">
+              {items.map((it) => (
+                <li key={it.id} className="card">
+                  <div className="flex justify-between">
+                    <div>
+                      <div className="font-medium">{it.name}</div>
+                      <div className="text-sm text-gray-500">{it.category}</div>
+                    </div>
+                    <div className="text-xs text-gray-500">{it.color}</div>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button className="px-3 py-1 border rounded-lg text-sm">Éditer</button>
+                    <button className="px-3 py-1 border rounded-lg text-sm">Favori</button>
+                    <button className="px-3 py-1 border rounded-lg text-sm">Partager</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </main>
+    </>
   );
 }
+
 
