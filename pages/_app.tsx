@@ -1,17 +1,15 @@
-import "@/styles/globals.css";
-import type { AppProps } from "next/app";
-import Header from "@/components/Header";
-import AnnaBubble from "@/components/AnnaBubble";
-import CookieBanner from "@/components/CookieBanner";
+import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
+import { useState } from "react";
+import "../styles/globals.css";
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: any) {
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient());
+
   return (
-    <>
-      <Header />
+    <SessionContextProvider supabaseClient={supabaseClient}>
       <Component {...pageProps} />
-      <AnnaBubble />
-      <CookieBanner />
-    </>
+    </SessionContextProvider>
   );
 }
 
