@@ -2,14 +2,17 @@ export default function About() {
   return (
     <main className="container mx-auto px-6 py-16 max-w-3xl leading-relaxed">
       <h1 className="text-3xl font-bold mb-6">À propos de GQOKA</h1>
-      <p className="text-sm text-gray-500 mb-10">Notre vision, notre mission, notre différence</p>
+      <p className="text-sm text-gray-500 mb-10">
+        Notre vision, notre mission, notre différence
+      </p>
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-2">👗 La vision</h2>
         <p>
-          <strong>GQOKA</strong> est né d’une idée simple : rendre le stylisme accessible à tous,
-          sans compromis sur l’élégance ni sur la technologie. Nous croyons que chaque garde-robe
-          raconte une histoire, et que chaque vêtement mérite une seconde vie.
+          <strong>GQOKA</strong> est né d’une idée simple : rendre le stylisme
+          accessible à tous, sans compromis sur l’élégance ni sur la
+          technologie. Nous croyons que chaque garde-robe raconte une histoire,
+          et que chaque vêtement mérite une seconde vie.
         </p>
       </section>
 
@@ -33,4 +36,14 @@ export default function About() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-xl
+        <h2 className="text-xl font-semibold mb-2">🚀 Notre mission</h2>
+        <p>
+          GQOKA veut transformer la manière dont nous interagissons avec nos vêtements :  
+          plus responsable, plus inspirant et plus personnalisé.
+        </p>
+      </section>
+    </main>
+  );
+}
+
+        
