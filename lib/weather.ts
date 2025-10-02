@@ -10,7 +10,7 @@ export function weatherAdvice(weather: any) {
   if (!weather) return "Impossible de récupérer la météo.";
   const t = weather.temperature;
   const code = weather.weathercode;
-  if (code === 61 || code === 63) return "Prends un imperméable, il pleut.";
+  if ([61, 63, 65].includes(code)) return "Prends un imperméable, il pleut.";
   if (t < 5) return "Couvre-toi, il fait froid.";
   if (t > 25) return "Opte pour une tenue légère, il fait chaud.";
   return "Temps neutre, choisis ton style préféré.";
