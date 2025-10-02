@@ -20,7 +20,7 @@ export default function WeatherWidget() {
         async (pos) => {
           const { latitude, longitude } = pos.coords;
           try {
-            const data = await getWeather(`${latitude},${longitude}`);
+         const data = await getWeather(latitude, longitude);
             if (!data) {
               setError("Impossible de récupérer la météo.");
             } else {
