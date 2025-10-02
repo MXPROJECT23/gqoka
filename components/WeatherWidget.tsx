@@ -1,43 +1,36 @@
+"use client";
 import { useEffect, useState } from "react";
-import { getWeather } from "../lib/weather";
-
-interface WeatherData {
-  current: {
-    temp_c: number;
-    condition: { text: string; icon: string };
-  };
-  location: { name: string; country: string };
-}
+import { getWeather, weatherAdvice } from "@/lib/weather";
 
 export default function WeatherWidget() {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [message, setMessage] = useState("Anna prépare la météo…");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (navigator.geolocation) {
+    if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          const { latitude, longitude } = pos.coords;
           try {
-         const data = await getWeather(latitude, longitude);
+            const { latitude, longitude } = pos.coords;
+            const data = await getWeather(latitude, longitude); // ✅ deux arguments
             if (!data) {
               setError("Impossible de récupérer la météo.");
             } else {
-              setWeather(data);
+              setMessage(weatherAdvice(data));
             }
-          } catch (e) {
-            setError("Erreur API météo.");
+          } catch {
+            setError("Erreur lors de la récupération de la météo.");
+          } finally {
+            setLoading(false);
           }
-          setLoading(false);
         },
         () => {
-          setError("Localisation refusée. Météo par défaut : Paris.");
-          setLoading(false);
-          // Fallback sur Paris si l'utilisateur refuse la localisation
-          getWeather("Paris").then((data) => {
-            if (data) setWeather(data);
+          // ✅ fallback sur Paris avec lat/lon
+          getWeather(48.8566, 2.3522).then((data) => {
+            if (data) setMessage(weatherAdvice(data));
           });
+          setLoading(false);
         }
       );
     } else {
@@ -46,24 +39,14 @@ export default function WeatherWidget() {
     }
   }, []);
 
-  if (loading) return <p>⏳ Chargement de la météo...</p>;
-  if (error && !weather) return <p className="text-red-500">{error}</p>;
-  if (!weather) return null;
+  if (loading) return <p className="text-gray-500">Chargement météo…</p>;
 
   return (
-    <div className="flex items-center space-x-3 bg-white shadow rounded-lg px-4 py-2">
-      <img src={weather.current.condition.icon} alt="icon" className="w-8 h-8" />
-      <div>
-        <p className="font-medium">
-          {weather.location.name}, {weather.location.country}
-        </p>
-        <p className="text-sm text-gray-600">
-          {weather.current.temp_c}°C – {weather.current.condition.text}
-        </p>
-      </div>
+    <div className="p-4 border rounded-lg bg-gray-50">
+      <h3 className="font-semibold mb-2">Conseil météo par Anna</h3>
+      {error ? <p className="text-red-500">{error}</p> : <p>{message}</p>}
     </div>
   );
 }
-
 
 
