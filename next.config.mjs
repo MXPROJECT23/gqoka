@@ -9,7 +9,5 @@ const securityHeaders = [
 export default {
   reactStrictMode: true,
   images: { domains: [] },
-  async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
-  }
+  async headers() { return [{ source: "/(.*)", headers: securityHeaders }]; }
 };
