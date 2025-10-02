@@ -1,50 +1,34 @@
 import Head from "next/head";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 export default function Home() {
   return (
     <>
       <Head>
-        <title>GQOKA — Votre styliste personnelle </title>
+        <title>GQOKA — Votre styliste personnelle IA</title>
         <meta
           name="description"
-          content="Anna, la styliste  de GQOKA, organise votre garde-robe, recommande vos looks et prépare vos annonces de revente."
+          content="Anna, la styliste IA de GQOKA, organise votre garde-robe, recommande vos looks et prépare vos annonces de revente."
         />
       </Head>
       <main className="relative">
         {/* Hero section */}
         <section className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 text-center px-6">
-          <motion.h1
-            className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight opacity-0 animate-fade-in">
             Bienvenue dans <span className="text-black">GQOKA</span>
-          </motion.h1>
-          <motion.p
-            className="mt-6 text-lg md:text-xl text-gray-600 max-w-2xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            Anna, votre styliste personnelle, gère votre garde-robe, vous conseille selon la météo
+          </h1>
+          <p className="mt-6 text-lg md:text-xl text-gray-600 max-w-2xl opacity-0 animate-fade-in-delay">
+            Anna, votre styliste personnelle IA, gère votre garde-robe, vous conseille selon la météo
             et prépare vos ventes sur les marketplaces.
-          </motion.p>
-          <motion.div
-            className="mt-10 flex flex-wrap gap-4 justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
+          </p>
+          <div className="mt-10 flex flex-wrap gap-4 justify-center opacity-0 animate-fade-in-delay2">
             <Link href="/wardrobe" className="btn px-6 py-3 text-lg">
               Commencer avec Anna
             </Link>
             <Link href="/looks" className="px-6 py-3 border rounded-lg text-lg hover:bg-gray-50">
               Découvrir les looks
             </Link>
-          </motion.div>
+          </div>
 
           {/* Background effect */}
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.05),transparent_70%)]"></div>
@@ -89,4 +73,5 @@ export default function Home() {
     </>
   );
 }
+
 
