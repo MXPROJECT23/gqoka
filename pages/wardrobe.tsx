@@ -14,10 +14,8 @@ export default function Wardrobe() {
   const bucket = "wardrobe";
 
   useEffect(() => {
-    // Vérifie si utilisateur connecté
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
 
-    // Geoloc utilisateur → météo
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
@@ -25,17 +23,13 @@ export default function Wardrobe() {
             const w = await getWeather(pos.coords.latitude, pos.coords.longitude);
             setWeatherText(weatherAdvice(w));
           } catch {
-            setWeatherText("Anna ne peut pas lire la météo pour le moment.");
+            setWeatherText("Anna n’arrive pas à lire la météo pour le moment.");
           }
         },
         () => {
-          // fallback Paris
           getWeather(48.8566, 2.3522).then((w) => setWeatherText(weatherAdvice(w)));
         }
       );
-    } else {
-      // fallback si pas de geoloc
-      getWeather(48.8566, 2.3522).then((w) => setWeatherText(weatherAdvice(w)));
     }
   }, []);
 
@@ -66,7 +60,7 @@ export default function Wardrobe() {
       body: JSON.stringify(item)
     });
     const { texte, hashtags } = await res.json();
-    alert(`Texte prêt pour ta revente :\n\n${texte}\n\n${hashtags}`);
+    alert(`Texte de revente proposé par Anna :\n\n${texte}\n\n${hashtags}`);
   };
 
   return (
@@ -77,7 +71,7 @@ export default function Wardrobe() {
         <p className="text-gray-600 mb-6">Anna dit : {weatherText}</p>
 
         {!email ? (
-          <p className="text-gray-600">Connecte-toi pour ajouter des articles.</p>
+          <p className="text-gray-600">Connecte-toi pour qu’Anna t’aide à organiser ta garde-robe.</p>
         ) : (
           <PhotoUploader onSelected={addItem} />
         )}
@@ -85,7 +79,7 @@ export default function Wardrobe() {
         <div className="mt-8">
           <h2 className="font-semibold mb-3">Mes articles</h2>
           {items.length === 0 ? (
-            <p className="text-gray-500">Ajoute ton premier article.</p>
+            <p className="text-gray-500">Ajoute ton premier article et Anna s’en occupe.</p>
           ) : (
             <ul className="grid-auto">
               {items.map((it) => (
@@ -102,7 +96,10 @@ export default function Wardrobe() {
                     <button className="px-3 py-1 border rounded-lg text-sm">Éditer</button>
                     <button className="px-3 py-1 border rounded-lg text-sm">Favori</button>
                     <button className="px-3 py-1 border rounded-lg text-sm">Partager</button>
-                    <button className="px-3 py-1 border rounded-lg text-sm bg-gray-100" onClick={() => revendre(it)}>
+                    <button
+                      className="px-3 py-1 border rounded-lg text-sm bg-gray-100"
+                      onClick={() => revendre(it)}
+                    >
                       Revendre
                     </button>
                   </div>
