@@ -35,7 +35,11 @@ export default function Profile() {
     <div className="max-w-xl mx-auto card space-y-4">
       <h2 className="text-2xl font-semibold">Profil</h2>
 
-      <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} />
+      {/* label masqué pour éviter le texte visible sous le cercle */}
+      <span id="avatar-label" className="sr-only">Avatar</span>
+      <div aria-labelledby="avatar-label">
+        <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} />
+      </div>
 
       <div>
         <span className="label">Email</span>
@@ -54,4 +58,5 @@ export default function Profile() {
     </div>
   )
 }
+
 
