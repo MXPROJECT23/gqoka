@@ -1,50 +1,25 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from "react";
+import Autocomplete from "./Autocomplete";
+import { supabase } from "../lib/supabaseClient";
 
 export default function BrandAutocomplete({
-  value, onChange,
-}: { value: string; onChange: (v: string) => void }) {
-  const [q, setQ] = useState(value ?? '')
-  const [opts, setOpts] = useState<string[]>([])
-  const [open, setOpen] = useState(false)
+  value, onChange, placeholder = "Marque",
+}: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [options, setOptions] = useState<string[]>([]);
 
-  const debounced = useMemo(() => {
-    let t: any
-    return (v: string) => { clearTimeout(t); t = setTimeout(() => fetchOpts(v), 120) }
-  }, [])
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase.from("brands").select("name").order("name").limit(500);
+      if (error) { setOptions(DEFAULT_BRANDS); return; }
+      const names = Array.from(new Set((data || []).map(b => b.name).filter(Boolean)));
+      setOptions(names.length ? names : DEFAULT_BRANDS);
+    })();
+  }, []);
 
-  async function fetchOpts(v: string) {
-    if (!v) { setOpts([]); return }
-    try {
-      const r = await fetch(`/.netlify/functions/brands?q=${encodeURIComponent(v)}`)
-      const data = await r.json()
-      setOpts((data || []).map((d: any) => d.name ?? d))
-      setOpen(true)
-    } catch { setOpts([]) }
-  }
-
-  useEffect(() => { debounced(q) }, [q])
-
-  return (
-    <div className="relative">
-      <input
-        className="input"
-        placeholder="Marque"
-        value={q}
-        onChange={e => { setQ(e.target.value); onChange(e.target.value) }}
-        onFocus={() => q && setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-      />
-      {open && opts.length > 0 && (
-        <ul className="absolute z-10 bg-white border rounded-xl mt-1 w-full max-h-56 overflow-auto shadow">
-          {opts.map(o => (
-            <li key={o}
-                className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                onMouseDown={() => { onChange(o); setQ(o); setOpen(false) }}>
-              {o}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
+  return <Autocomplete value={value} onChange={onChange} options={options} placeholder={placeholder} />;
 }
+
+const DEFAULT_BRANDS = [
+  "Zara","H&M","Uniqlo","Nike","Adidas","Levi's","Mango","Pull&Bear","COS",
+  "Armani","Boss","Lacoste","The Kooples","Sandro","A.P.C.","Balenciaga"
+];
