@@ -79,7 +79,7 @@ export default function AvatarUploader({
   return (
     <div className="w-full flex justify-center">
       <div
-        className="relative group rounded-full overflow-hidden border mx-auto"
+        className="relative group rounded-full overflow-hidden border mx-auto bg-white z-10"
         style={{ width: size, height: size }}
       >
         {cam ? (
@@ -92,7 +92,7 @@ export default function AvatarUploader({
           />
         )}
 
-        {/* voile + actions, masqués par défaut puis visibles au survol/focus */}
+        {/* actions masquées par défaut */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition">
           <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
