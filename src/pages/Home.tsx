@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// petit hook météo (Open-Meteo, sans clé)
+// Hook météo (Open-Meteo, sans clé)
 function useWeatherSummary() {
   const [temp, setTemp] = useState<number | null>(null);
   const [label, setLabel] = useState<string>("");
@@ -62,13 +62,13 @@ export default function Home() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-12">
+      {/* Hero */}
       <header className="text-center space-y-4 mb-10">
         <h1 className="text-5xl font-extrabold tracking-tight">GQOKA</h1>
         <p className="text-lg text-neutral-600">
-          Garde-robe intelligente. Conseils d’Anna. Prête pour la revente.
+          Votre garde-robe intelligente. <b>Anna</b>, votre styliste personnelle,
+          propose des tenues adaptées à la météo et valorise vos pièces pour la revente.
         </p>
-
-        {/* bouton principal */}
         <button
           className="btn btn-primary px-6 py-3 text-base"
           onClick={() => nav("/dashboard")}
@@ -77,7 +77,7 @@ export default function Home() {
         </button>
       </header>
 
-      {/* 2 cartes uniquement */}
+      {/* 2 cartes principales */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Garde-robe */}
         <button
@@ -114,8 +114,29 @@ export default function Home() {
           )}
         </button>
       </section>
+
+      {/* Valeur ajoutée d’Anna */}
+      <section className="mt-10 card">
+        <h3 className="text-xl font-semibold mb-3">
+          Rencontrez Anna, votre styliste personnelle
+        </h3>
+
+        <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-neutral-700">
+          <li>👗 Propose des tenues selon la <b>météo</b>, vos goûts et votre dressing.</li>
+          <li>🧠 Combine ce que vous possédez déjà, évite les doublons et inspire des looks.</li>
+          <li>📸 Aide à <b>photographier</b> les articles et les classe proprement.</li>
+          <li>📝 Rédige des <b>annonces de revente</b> prêtes à <b>copier/partager</b>.</li>
+          <li>✅ Donne un <b>score de certification</b> transparent pour inspirer confiance.</li>
+          <li>🔒 Respecte votre vie privée (données hébergées sur Supabase, transit chiffré).</li>
+        </ul>
+
+        <div className="mt-4">
+          <button className="btn btn-primary" onClick={() => nav("/dashboard")}>
+            Lancer une suggestion
+          </button>
+        </div>
+      </section>
     </main>
   );
 }
-
 
