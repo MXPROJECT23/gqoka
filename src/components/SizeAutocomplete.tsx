@@ -1,84 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import Autocomplete from "./Autocomplete";
 
-type Props = {
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-  placeholder?: string;
-};
-
-export default function Autocomplete({ value, onChange, options, placeholder }: Props) {
-  const [q, setQ] = useState(value || "");
-  const [open, setOpen] = useState(false);
-  const [hi, setHi] = useState(0);
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => setQ(value || ""), [value]);
-
-  // fermer si clic en dehors
-  useEffect(() => {
-    function close(e: MouseEvent) {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, []);
-
-  const filtered = useMemo(() => {
-    const s = (q || "").trim().toLowerCase();
-    if (!s) return options.slice(0, 50);
-    return options.filter(o => o.toLowerCase().includes(s)).slice(0, 50);
-  }, [q, options]);
-
-  function choose(v: string) {
-    onChange(v);
-    setQ(v);
-    setOpen(false);
-  }
-
-  function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open && (e.key === "ArrowDown" || e.key === "Enter")) setOpen(true);
-    if (!open) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setHi(h => Math.min(h + 1, filtered.length - 1)); }
-    if (e.key === "ArrowUp")   { e.preventDefault(); setHi(h => Math.max(h - 1, 0)); }
-    if (e.key === "Enter")     { e.preventDefault(); if (filtered[hi]) choose(filtered[hi]); }
-    if (e.key === "Escape")    { setOpen(false); }
-  }
-
-  return (
-    <div ref={wrapRef} className="relative">
-      <input
-        className="input w-full"
-        placeholder={placeholder}
-        value={q}
-        onChange={e => { setQ(e.target.value); setOpen(true); setHi(0); }}
-        onFocus={() => setOpen(true)}
-        onKeyDown={onKey}
-      />
-      {open && filtered.length > 0 && (
-        <div
-          className="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-md max-h-56 overflow-auto"
-          role="listbox"
-        >
-          {filtered.map((opt, i) => (
-            <button
-              type="button"
-              key={opt + i}
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => choose(opt)}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-neutral-100 ${
-                i === hi ? "bg-neutral-100" : ""
-              }`}
-              role="option"
-              aria-selected={value === opt}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+export default function SizeAutocomplete({
+  value, onChange, placeholder = "Taille",
+}: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return <Autocomplete value={value} onChange={onChange} options={SIZES} placeholder={placeholder} />;
 }
 
+const SIZES = [
+  // alpha
+  "XXS","XS","S","M","L","XL","XXL","3XL",
+  // num (EU)
+  "32","34","36","38","40","42","44","46","48","50",
+  // chaussures EU
+  "35","36","37","38","39","40","41","42","43","44","45","46"
+];
 
