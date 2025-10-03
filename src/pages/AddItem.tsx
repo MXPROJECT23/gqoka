@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import ImageUploader from '../components/ImageUploader'
 import BrandAutocomplete from '../components/BrandAutocomplete'
 import SizeAutocomplete from '../components/SizeAutocomplete'
+import TypeAutocomplete from '../components/TypeAutocomplete'
+import ColorAutocomplete from '../components/ColorAutocomplete'
 
 export default function AddItem(){
   const [title,setTitle]=useState('')
@@ -16,7 +18,7 @@ export default function AddItem(){
   async function save(){
     setSaving(true)
     const { data:{ user } } = await supabase.auth.getUser()
-    if(!user){ alert('Connecte-toi'); return }
+    if(!user){ alert('Connecte-toi'); setSaving(false); return }
     const { error } = await supabase.from('items').insert({ user_id:user.id, title, brand, color, size, type, photos })
     setSaving(false)
     if(error) alert(error.message)
@@ -26,13 +28,18 @@ export default function AddItem(){
   return (
     <div className="max-w-xl mx-auto space-y-3">
       <h1 className="text-2xl font-semibold">Ajouter un vêtement</h1>
+
       <input className="input" placeholder="Titre" value={title} onChange={e=>setTitle(e.target.value)} />
+
       <BrandAutocomplete value={brand} onChange={setBrand} />
-      <input className="input" placeholder="Couleur" value={color} onChange={e=>setColor(e.target.value)} />
+      <ColorAutocomplete value={color} onChange={setColor} />
       <SizeAutocomplete value={size} onChange={setSize} />
-      <input className="input" placeholder="Type (t-shirt, robe…)" value={type} onChange={e=>setType(e.target.value)} />
+      <TypeAutocomplete value={type} onChange={setType} />
+
       <ImageUploader onDone={(urls)=>setPhotos(prev=>[...prev, ...urls])} />
+
       <button className="btn btn-primary w-full" disabled={saving} onClick={save}>Enregistrer</button>
     </div>
   )
 }
+
