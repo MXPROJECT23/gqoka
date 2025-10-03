@@ -2,14 +2,13 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>GQOKA — MVP</title>
   </head>
   <body>
     <div id="root"></div>
 
-    <!-- Anna - Dialogflow Messenger -->
+    <!-- Anna (Dialogflow ES) -->
     <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
     <df-messenger
       intent="WELCOME"
@@ -21,10 +20,11 @@
     <style>
       df-messenger {
         --df-messenger-bot-message: #f5f5f5;
-        --df-messenger-button-titlebar-color: #000000;
-        --df-messenger-chat-background-color: #ffffff;
+        --df-messenger-button-titlebar-color: #000;
+        --df-messenger-chat-background-color: #fff;
       }
     </style>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
