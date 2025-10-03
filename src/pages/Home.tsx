@@ -1,46 +1,57 @@
-import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { supabase } from "../lib/supabaseClient"
+// src/pages/Home.tsx
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Home() {
-  const nav = useNavigate()
-  const [startTo, setStartTo] = useState<string>("/login")
+  const [dest, setDest] = useState("/login");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setStartTo(data.session ? "/dashboard" : "/login")
-    })
-  }, [])
-
-  const Card = ({ to, title, desc }: { to: string; title: string; desc: string }) => (
-    <Link
-      to={to}
-      className="card block hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-black"
-      aria-label={title}
-    >
-      <h3 className="font-semibold">{title}</h3>
-      <p className="text-neutral-600">{desc}</p>
-    </Link>
-  )
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setDest(user ? "/dashboard" : "/login");
+    })();
+  }, []);
 
   return (
-    <section className="text-center py-16">
-      <h1 className="text-4xl font-bold">GQOKA</h1>
-      <p className="mt-3 text-neutral-600">
-        Garde-robe intelligente. Conseils d'Anna. Prête pour la revente.
-      </p>
+    <main className="max-w-5xl mx-auto px-4 py-12">
+      {/* Hero */}
+      <header className="text-center space-y-4">
+        <h1 className="text-4xl font-extrabold tracking-tight">GQOKA</h1>
+        <p className="text-neutral-600">
+          Garde-robe intelligente. Conseils d’Anna. Prête pour la revente.
+        </p>
 
-      <div className="mt-6 flex justify-center gap-3">
-        <button onClick={() => nav(startTo)} className="btn btn-primary">Commencer</button>
-        <a href="#features" className="btn border">Fonctionnalités</a>
-      </div>
+        {/* CTA unique */}
+        <div className="mt-6">
+          <Link to={dest} className="btn btn-primary px-6">
+            Commencer
+          </Link>
+        </div>
+      </header>
 
-      <div id="features" className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card to="/login" title="Connexion sécurisée" desc="Supabase Auth email." />
-        <Card to="/wardrobe" title="Garde-robe" desc="Ajouter / modifier / supprimer." />
-        <Card to="/dashboard" title="Anna + météo" desc="Suggestions de tenues." />
-      </div>
-    </section>
-  )
+      {/* Section d’information (optionnelle) */}
+      <section className="mt-10 grid gap-4 sm:grid-cols-3">
+        <div className="card">
+          <h3 className="font-semibold">Connexion sécurisée</h3>
+          <p className="text-sm text-neutral-600">Supabase Auth email.</p>
+        </div>
+
+        <div className="card">
+          <h3 className="font-semibold">Garde-robe</h3>
+          <p className="text-sm text-neutral-600">
+            Ajouter / modifier / supprimer vos vêtements.
+          </p>
+        </div>
+
+        <div className="card">
+          <h3 className="font-semibold">Anna + météo</h3>
+          <p className="text-sm text-neutral-600">
+            Suggestions de tenues contextuelles.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
 }
 
