@@ -1,45 +1,68 @@
-import { useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
-import ImageUploader from '../components/ImageUploader'
-import BrandAutocomplete from '../components/BrandAutocomplete'
-import SizeAutocomplete from '../components/SizeAutocomplete'
-import TypeAutocomplete from '../components/TypeAutocomplete'
-import ColorAutocomplete from '../components/ColorAutocomplete'
+import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+import BrandAutocomplete from "../components/BrandAutocomplete";
+import ColorAutocomplete from "../components/ColorAutocomplete";
+import SizeAutocomplete from "../components/SizeAutocomplete";
+import TypeAutocomplete from "../components/TypeAutocomplete";
 
-export default function AddItem(){
-  const [title,setTitle]=useState('')
-  const [brand,setBrand]=useState('')
-  const [color,setColor]=useState('')
-  const [size,setSize]=useState('')
-  const [type,setType]=useState('')
-  const [photos,setPhotos]=useState<string[]>([])
-  const [saving,setSaving]=useState(false)
+type Item = {
+  title: string; brand: string; color: string; size: string; type: string;
+  photos: string[];
+};
 
-  async function save(){
-    setSaving(true)
-    const { data:{ user } } = await supabase.auth.getUser()
-    if(!user){ alert('Connecte-toi'); setSaving(false); return }
-    const { error } = await supabase.from('items').insert({ user_id:user.id, title, brand, color, size, type, photos })
-    setSaving(false)
-    if(error) alert(error.message)
-    else window.location.href='/wardrobe'
+export default function AddItem() {
+  const [item, setItem] = useState<Item>({
+    title: "", brand: "", color: "", size: "", type: "", photos: []
+  });
+
+  async function save() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return alert("Connecte-toi");
+    const { error } = await supabase.from("items").insert({
+      user_id: user.id,
+      title: item.title,
+      brand: item.brand,
+      color: item.color,
+      size: item.size,
+      type: item.type,
+      photos: item.photos
+    });
+    if (error) return alert(error.message);
+    window.location.href = "/wardrobe";
   }
 
   return (
-    <div className="max-w-xl mx-auto space-y-3">
-      <h1 className="text-2xl font-semibold">Ajouter un vêtement</h1>
+    <div className="max-w-2xl mx-auto space-y-4">
+      <h1 className="text-3xl font-bold">Ajouter un vêtement</h1>
 
-      <input className="input" placeholder="Titre" value={title} onChange={e=>setTitle(e.target.value)} />
+      <input
+        className="input"
+        placeholder="Titre"
+        value={item.title}
+        onChange={e => setItem({ ...item, title: e.target.value })}
+      />
 
-      <BrandAutocomplete value={brand} onChange={setBrand} />
-      <ColorAutocomplete value={color} onChange={setColor} />
-      <SizeAutocomplete value={size} onChange={setSize} />
-      <TypeAutocomplete value={type} onChange={setType} />
+      <BrandAutocomplete
+        value={item.brand}
+        onChange={(v) => setItem({ ...item, brand: v })}
+      />
 
-      <ImageUploader onDone={(urls)=>setPhotos(prev=>[...prev, ...urls])} />
+      <ColorAutocomplete
+        value={item.color}
+        onChange={(v) => setItem({ ...item, color: v })}
+      />
 
-      <button className="btn btn-primary w-full" disabled={saving} onClick={save}>Enregistrer</button>
+      <SizeAutocomplete
+        value={item.size}
+        onChange={(v) => setItem({ ...item, size: v })}
+      />
+
+      <TypeAutocomplete
+        value={item.type}
+        onChange={(v) => setItem({ ...item, type: v })}
+      />
+
+      <button className="btn btn-primary" onClick={save}>Enregistrer</button>
     </div>
-  )
+  );
 }
-
