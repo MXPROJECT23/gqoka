@@ -1,6 +1,17 @@
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { supabase } from "../lib/supabaseClient"
 
 export default function Home() {
+  const nav = useNavigate()
+  const [startTo, setStartTo] = useState<string>("/login")
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setStartTo(data.session ? "/dashboard" : "/login")
+    })
+  }, [])
+
   const Card = ({ to, title, desc }: { to: string; title: string; desc: string }) => (
     <Link
       to={to}
@@ -15,10 +26,12 @@ export default function Home() {
   return (
     <section className="text-center py-16">
       <h1 className="text-4xl font-bold">GQOKA</h1>
-      <p className="mt-3 text-neutral-600">Garde-robe intelligente. Conseils d'Anna. Prête pour la revente.</p>
+      <p className="mt-3 text-neutral-600">
+        Garde-robe intelligente. Conseils d'Anna. Prête pour la revente.
+      </p>
 
       <div className="mt-6 flex justify-center gap-3">
-        <Link to="/login" className="btn btn-primary">Commencer</Link>
+        <button onClick={() => nav(startTo)} className="btn btn-primary">Commencer</button>
         <a href="#features" className="btn border">Fonctionnalités</a>
       </div>
 
