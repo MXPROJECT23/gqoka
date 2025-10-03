@@ -1,6 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.icon-btn { @apply w-14 h-14 rounded-full border flex items-center justify-center bg-white hover:bg-neutral-50 shadow active:scale-95 transition; }
+
 
 :root { color-scheme: light; }
 body { @apply bg-white text-neutral-900 antialiased; }
