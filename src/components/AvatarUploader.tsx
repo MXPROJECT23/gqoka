@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
 
 const CameraIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <path d="M4 7h3l1.4-2.1A2 2 0 0 1 10.1 4h3.8a2 2 0 0 1 1.7.9L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="1.6"/>
     <circle cx="12" cy="13.5" r="4" stroke="currentColor" strokeWidth="1.6"/>
   </svg>
 )
 const GalleryIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/>
     <path d="M6 15l3.5-3.5a1 1 0 0 1 1.4 0L14 15l2-2a1 1 0 0 1 1.4 0L19 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
     <circle cx="9" cy="9" r="1.25" fill="currentColor"/>
@@ -16,7 +16,7 @@ const GalleryIcon = () => (
 )
 
 export default function AvatarUploader({
-  value, onChange, size = 160,
+  value, onChange, size = 180,
 }: { value?: string; onChange: (url: string) => void; size?: number }) {
   const [busy, setBusy] = useState(false)
   const [cam, setCam] = useState(false)
@@ -36,9 +36,7 @@ export default function AvatarUploader({
         await videoRef.current.play()
         setCam(true)
       }
-    } catch {
-      captureRef.current?.click()
-    }
+    } catch { captureRef.current?.click() }
   }
   function stopCam() {
     streamRef.current?.getTracks().forEach(t => t.stop())
@@ -49,12 +47,11 @@ export default function AvatarUploader({
   async function capture() {
     if (!videoRef.current) return
     const v = videoRef.current
+    const S = Math.min(v.videoWidth || 512, v.videoHeight || 512)
     const c = document.createElement("canvas")
-    const S = Math.min(v.videoWidth, v.videoHeight) || 512
     c.width = S; c.height = S
     const ctx = c.getContext("2d")!
-    // crop carré centré
-    const sx = (v.videoWidth - S) / 2, sy = (v.videoHeight - S) / 2
+    const sx = Math.max(0, (v.videoWidth - S) / 2), sy = Math.max(0, (v.videoHeight - S) / 2)
     ctx.drawImage(v, sx, sy, S, S, 0, 0, S, S)
     const blob: Blob = await new Promise(r => c.toBlob(b => r(b!), "image/jpeg", 0.9)!)
     await upload([new File([blob], `avatar-${crypto.randomUUID()}.jpg`, { type: "image/jpeg" })])
@@ -71,20 +68,18 @@ export default function AvatarUploader({
     setBusy(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setBusy(false); alert("Connecte-toi"); return }
-
-    // un seul avatar => on prend le premier fichier
     const f = files[0]
     const key = `users/${user.id}/${crypto.randomUUID()}-${f.name}`.replace(/\s+/g, "-")
-    const { error } = await supabase.storage.from("avatars").upload(key, f, { upsert: false })
+    const { error } = await supabase.storage.from("avatars").upload(key, f)
     if (error) { setBusy(false); alert(error.message); return }
     const { data } = supabase.storage.from("avatars").getPublicUrl(key)
     setBusy(false); stopCam(); onChange(data.publicUrl)
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="w-full flex justify-center">
       <div
-        className="relative rounded-full overflow-hidden border"
+        className="relative group rounded-full overflow-hidden border mx-auto"
         style={{ width: size, height: size }}
       >
         {cam ? (
@@ -97,28 +92,29 @@ export default function AvatarUploader({
           />
         )}
 
-        {/* boutons flottants */}
-        <div className="absolute bottom-2 right-2 flex gap-2">
-          {!cam && (
-            <>
-              <button className="icon-btn !w-10 !h-10" aria-label="Caméra" onClick={startCam}><CameraIcon /></button>
-              <button className="icon-btn !w-10 !h-10" aria-label="Galerie" onClick={() => fileRef.current?.click()}><GalleryIcon /></button>
-            </>
-          )}
-          {cam && (
-            <div className="flex gap-2">
-              <button className="icon-btn !w-10 !h-10" aria-label="Capturer" onClick={capture}><CameraIcon /></button>
-              <button className="icon-btn !w-10 !h-10" aria-label="Fermer" onClick={stopCam}>✕</button>
-            </div>
-          )}
+        {/* voile + actions, masqués par défaut puis visibles au survol/focus */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+            {!cam ? (
+              <>
+                <button className="icon-btn !w-10 !h-10" aria-label="Caméra" onClick={startCam}><CameraIcon/></button>
+                <button className="icon-btn !w-10 !h-10" aria-label="Galerie" onClick={()=>fileRef.current?.click()}><GalleryIcon/></button>
+              </>
+            ) : (
+              <>
+                <button className="icon-btn !w-10 !h-10" aria-label="Capturer" onClick={capture}><CameraIcon/></button>
+                <button className="icon-btn !w-10 !h-10" aria-label="Fermer" onClick={stopCam}>✕</button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* inputs cachés */}
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
-      <input ref={captureRef} type="file" accept="image/*" capture="user" className="hidden" onChange={onPick} />
-
-      {busy && <span>Upload…</span>}
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick}/>
+      <input ref={captureRef} type="file" accept="image/*" capture="user" className="hidden" onChange={onPick}/>
+      {busy && <span className="ml-3 self-center text-sm text-neutral-600">Upload…</span>}
     </div>
   )
 }
