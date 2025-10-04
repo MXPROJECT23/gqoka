@@ -1,14 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root { color-scheme: light; }
-body { @apply bg-white text-neutral-900 antialiased; }
-.container { @apply max-w-5xl mx-auto px-4; }
-.card { @apply bg-white rounded-2xl shadow p-4; }
-.btn { @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium; }
-.btn-primary { @apply bg-black text-white; }
-.input { @apply w-full border rounded-xl px-3 py-2; }
-.label { @apply text-sm font-medium text-neutral-700; }
-nav.top { @apply sticky top-0 bg-white/80 backdrop-blur border-b; }
-nav.top a { @apply px-2; }
