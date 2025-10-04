@@ -3,28 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GQOKA — MVP</title>
+    <title>GQOKA</title>
   </head>
   <body>
     <div id="root"></div>
-
-    <!-- Anna (Dialogflow ES) -->
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-    <df-messenger
-      intent="WELCOME"
-      chat-title="Anna"
-      agent-id="84d65a64-9de2-4ddc-97af-ac846bf9b4d9"
-      language-code="fr"
-      chat-icon="https://cdn-icons-png.flaticon.com/512/3597/3597088.png">
-    </df-messenger>
-    <style>
-      df-messenger {
-        --df-messenger-bot-message: #f5f5f5;
-        --df-messenger-button-titlebar-color: #000;
-        --df-messenger-chat-background-color: #fff;
-      }
-    </style>
-
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
